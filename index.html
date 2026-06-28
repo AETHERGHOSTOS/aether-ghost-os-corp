@@ -1,0 +1,2745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Aether Ghost OS — The world's most advanced mobile privacy and anonymity suite. Real-time threat detection, Tor routing, and hardware-level shields. No root required.">
+<meta property="og:title" content="Aether Ghost OS — Ghost the Grid. Own Your Privacy.">
+<meta property="og:description" content="Real-time threat monitoring, Tor anonymity, ARP spoofing detection and hardware-level camera/mic shields. No root required.">
+<title>Aether Ghost OS — Ghost the Grid. Own Your Privacy.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Space+Grotesk:wght@300;400;600;700&family=Zen+Dots&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --green:#00ff88;
+  --cyan:#00c8ff;
+  --red:#ff3355;
+  --orange:#ff9900;
+  --purple:#a855f7;
+  --bg:#040407;
+  --bg2:#060610;
+  --card:#0a0a16;
+  --card2:#0d0d1e;
+  --border:#14142a;
+  --border2:#1a1a30;
+  --text:#c0c0d8;
+  --muted:#70708a; /* Increased brightness for better contrast (A11y) */
+  --glass: rgba(10, 10, 22, 0.45);
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --glass-glow: rgba(0, 255, 136, 0.08);
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Space Grotesk',sans-serif;
+  overflow-x:hidden;
+  line-height:1.6;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border2);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* ── MATRIX RAIN ── */
+#matrix-canvas{
+  position:fixed;top:0;left:0;
+  width:100%;height:100%;
+  z-index:0;opacity:0.045;
+  pointer-events:none;
+}
+
+/* ── SCANLINE ── */
+body::before{
+  content:'';position:fixed;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px);
+  pointer-events:none;z-index:9999;
+}
+
+/* ── AMBIENT BACKGROUND GLOWS ── */
+.ambient-glow {
+  position: absolute;
+  width: 450px;
+  height: 450px;
+  border-radius: 50%;
+  filter: blur(140px);
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 0;
+  animation: glow-float 20s infinite alternate ease-in-out;
+}
+.glow-green {
+  background: var(--green);
+  top: 10%;
+  left: -15%;
+}
+.glow-cyan {
+  background: var(--cyan);
+  top: 40%;
+  right: -15%;
+  animation-delay: -5s;
+}
+.glow-purple {
+  background: var(--purple);
+  top: 75%;
+  left: -10%;
+  animation-delay: -10s;
+}
+@keyframes glow-float {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(30px, 40px) scale(1.15); }
+}
+
+/* ── SCROLL REVEAL ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;
+  z-index:1000;
+  background:rgba(4,4,7,0.85);
+  border-bottom:1px solid var(--border);
+  padding:15px 5%;
+  display:flex;justify-content:space-between;align-items:center;
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+}
+.nav-brand{
+  display:flex;align-items:center;gap:10px;
+  text-decoration:none;
+  z-index: 1002;
+}
+.nav-brand img{height:32px;width:32px;object-fit:contain;filter:drop-shadow(0 0 8px rgba(0,255,136,0.5));}
+.nav-brand-text{
+  font-family:'Zen Dots',sans-serif;
+  color:var(--green);font-size:1rem;
+  letter-spacing:3px;
+  text-shadow:0 0 14px rgba(0,255,136,0.35);
+}
+.nav-links{display:flex;gap:26px;}
+.nav-links a{
+  color:var(--muted);text-decoration:none;
+  font-size:0.8em;letter-spacing:1px;
+  text-transform:uppercase;transition:all 0.2s;
+  position: relative;
+  padding: 4px 0;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--green);
+  transition: width 0.2s ease;
+}
+.nav-links a:hover{color:var(--green);}
+.nav-links a:hover::after{width:100%;}
+
+.nav-cta{
+  background:rgba(0,255,136,0.08);
+  border:1px solid rgba(0,255,136,0.4);
+  color:var(--green);
+  padding:9px 20px;border-radius:7px;
+  font-family:'Space Grotesk',sans-serif;
+  font-size:0.78em;letter-spacing:2px;
+  cursor:pointer;text-decoration:none;
+  text-transform:uppercase;transition:all 0.2s;
+}
+.nav-cta:hover{background:rgba(0,255,136,0.16);box-shadow:0 0 20px rgba(0,255,136,0.25);transform: translateY(-1px);}
+
+/* HAMBURGER BUTTON & MOBILE DRAWER */
+.nav-hamburger {
+  display: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 1002;
+  padding: 4px;
+}
+.nav-hamburger span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--green);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.nav-hamburger.open span:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+.nav-hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+.nav-hamburger.open span:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+.mobile-nav {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 4, 7, 0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.mobile-nav.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.mobile-nav a {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 1.25rem;
+  text-transform: uppercase;
+  font-family: 'Zen Dots', sans-serif;
+  letter-spacing: 2px;
+  transition: color 0.2s, text-shadow 0.2s;
+}
+.mobile-nav a:hover {
+  color: var(--green);
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.6);
+}
+.mobile-nav .nav-cta {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.9rem;
+  padding: 12px 28px;
+}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;padding:120px 5% 60px;
+  position:relative;z-index:1;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(0,255,136,0.07);
+  border:1px solid rgba(0,255,136,0.2);
+  color:var(--green);padding:6px 18px;
+  border-radius:100px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:0.7em;letter-spacing:2px;margin-bottom:32px;
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.05);
+}
+.hero-badge::before{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:var(--green);animation:blink 1.5s infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.1}}
+
+.hero-logo{
+  width:min(200px,50vw);height:min(200px,50vw);
+  position:relative;margin-bottom:36px;
+}
+.hero-logo img{
+  width:100%;height:100%;object-fit:contain;
+  border-radius:50%;
+  filter:drop-shadow(0 0 32px rgba(0,255,136,0.45));
+  animation:float 4.5s ease-in-out infinite;
+}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.orbit{
+  position:absolute;inset:-18px;border-radius:50%;
+  border:1px dashed rgba(0,255,136,0.18);
+  animation:spin 22s linear infinite;
+}
+.orbit2{
+  position:absolute;inset:-36px;border-radius:50%;
+  border:1px dashed rgba(0,200,255,0.1);
+  animation:spin 40s linear infinite reverse;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.orbit-dot{
+  position:absolute;top:0;left:50%;
+  width:7px;height:7px;background:var(--green);
+  border-radius:50%;transform:translate(-50%,-50%);
+  box-shadow:0 0 10px var(--green);
+}
+.orbit2-dot{
+  position:absolute;top:50%;right:0;
+  width:5px;height:5px;background:var(--cyan);
+  border-radius:50%;transform:translate(50%,-50%);
+  box-shadow:0 0 8px var(--cyan);
+}
+
+.hero h1{
+  font-family:'Zen Dots',sans-serif;
+  font-size:clamp(2rem,6vw,4.2rem);
+  line-height:1.2;letter-spacing:3px;
+  color:#fff;
+  text-shadow:0 0 50px rgba(0,255,136,0.15);
+  margin-bottom:18px;
+}
+.hero h1 .g{color:var(--green);text-shadow:0 0 20px rgba(0,255,136,0.25);}
+.hero h1 .c{color:var(--cyan);text-shadow:0 0 20px rgba(0,200,255,0.25);}
+.hero-sub{
+  font-size:clamp(0.88rem,2vw,1.05rem);
+  color:var(--text);max-width:580px;
+  margin:0 auto 40px;line-height:1.85;
+}
+.hero-actions{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
+.btn-primary{
+  background:rgba(0,255,136,0.1);
+  border:1px solid var(--green);color:var(--green);
+  padding:14px 30px;border-radius:8px;
+  font-family:'Space Grotesk',sans-serif;
+  font-size:0.86em;letter-spacing:2px;
+  cursor:pointer;text-decoration:none;
+  transition:all 0.25s cubic-bezier(0.16, 1, 0.3, 1);text-transform:uppercase;
+  box-shadow: 0 4px 15px rgba(0,255,136,0.05);
+}
+.btn-primary:hover{background:rgba(0,255,136,0.18);box-shadow:0 0 26px rgba(0,255,136,0.3);transform:translateY(-3px);}
+.btn-secondary{
+  background:transparent;border:1px solid var(--border2);
+  color:var(--muted);padding:14px 30px;border-radius:8px;
+  font-size:0.86em;letter-spacing:2px;
+  cursor:pointer;text-decoration:none;
+  transition:all 0.25s cubic-bezier(0.16, 1, 0.3, 1);text-transform:uppercase;
+}
+.btn-secondary:hover{border-color:var(--muted);color:var(--text);transform:translateY(-2px);}
+
+/* ── STATS ── */
+.stats{
+  position:relative;z-index:1;
+  background:var(--bg2);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  padding:32px 5%;
+  display:flex;justify-content:space-around;
+  flex-wrap:wrap;gap:24px;
+}
+.stat-item{text-align:center;transition: transform 0.2s;}
+.stat-item:hover{transform: translateY(-2px);}
+.stat-num{
+  font-family:'Share Tech Mono',monospace;
+  font-size:2.2rem;color:var(--green);
+  font-weight:bold;display:block;
+  text-shadow: 0 0 10px rgba(0,255,136,0.3);
+}
+.stat-label{font-size:0.7em;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+
+/* ── GENERIC SECTION ── */
+section{position:relative;z-index:1;}
+.section-label{
+  font-family:'Share Tech Mono',monospace;
+  font-size:0.68em;color:var(--green);
+  letter-spacing:4px;text-transform:uppercase;margin-bottom:10px;
+}
+.section-title{
+  font-family:'Zen Dots',sans-serif;
+  font-size:clamp(1.4rem,4vw,2.4rem);
+  color:#fff;letter-spacing:2px;margin-bottom:14px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+.section-sub{color:var(--muted);max-width:560px;margin:0 auto 46px;font-size:0.88em;}
+
+/* ── FEATURES ── */
+.features{padding:80px 5%;}
+.features-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:20px;max-width:1100px;margin:0 auto;
+}
+.feature-card{
+  background:var(--glass);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--glass-border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  border-radius:13px;padding:26px;
+  transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1);position:relative;overflow:hidden;
+}
+.feature-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--green),transparent);
+  opacity:0;transition:opacity 0.3s;
+}
+.feature-card:hover{
+  border-color:rgba(0, 255, 136, 0.2);
+  transform:translateY(-5px);
+  box-shadow:0 14px 40px rgba(0,255,136,0.06), 0 0 30px rgba(0,0,0,0.5);
+}
+.feature-card:hover::before{opacity:1;}
+.feature-icon{font-size:1.9rem;margin-bottom:14px;filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));}
+.feature-card h3{font-size:1rem;font-weight:600;color:#eeeeff;margin-bottom:7px;}
+.feature-card p{font-size:0.8em;color:var(--text);opacity:0.85;line-height:1.75;}
+.feature-tag{
+  display:inline-block;margin-top:12px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:0.63em;padding:3px 10px;border-radius:4px;letter-spacing:1px;
+}
+.tag-live{background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.22);color:var(--green);}
+.tag-soon{background:rgba(0,200,255,0.06);border:1px solid rgba(0,200,255,0.2);color:var(--cyan);}
+
+/* ── THREATS ── */
+.threats-section{
+  padding:80px 5%;background:var(--bg2);
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+}
+.threat-list{max-width:800px;margin:0 auto;display:flex;flex-direction:column;gap:14px;}
+.threat-row{
+  display:flex;align-items:flex-start;gap:16px;
+  background:var(--glass);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--glass-border);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+  border-radius:10px;padding:18px 20px;
+  transition:all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.threat-row:hover{
+  border-color:rgba(0, 255, 136, 0.15);
+  transform: translateX(4px);
+  box-shadow: 0 4px 25px rgba(0, 255, 136, 0.04), 0 0 15px rgba(0,0,0,0.3);
+}
+.threat-icon{font-size:1.4rem;flex-shrink:0;margin-top:2px;}
+.threat-content h4{font-size:0.92rem;color:#e0e0f0;margin-bottom:4px;}
+.threat-content p{font-size:0.78em;color:var(--text);opacity:0.85;line-height:1.65;}
+.threat-status{
+  margin-left:auto;flex-shrink:0;
+  font-family:'Share Tech Mono',monospace;
+  font-size:0.63em;padding:4px 10px;border-radius:4px;align-self:center;
+}
+.status-blocked{background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.22);color:var(--green);}
+.status-detected{background:rgba(255,153,0,0.08);border:1px solid rgba(255,153,0,0.22);color:var(--orange);}
+.status-neutralized{background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.22);color:var(--purple);}
+
+/* ── HOW IT WORKS ── */
+.how-section{padding:80px 5%;text-align:center;}
+.steps-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:28px;max-width:900px;margin:0 auto;
+}
+.step{transition: transform 0.2s;}
+.step:hover{transform: translateY(-2px);}
+.step-num{
+  font-family:'Share Tech Mono',monospace;font-size:3rem;
+  color:rgba(0,255,136,0.12);font-weight:bold;line-height:1;margin-bottom:12px;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.05);
+}
+.step h3{font-size:0.98rem;color:#fff;margin-bottom:8px;}
+.step p{font-size:0.8em;color:var(--muted);line-height:1.7;}
+
+/* ── PLATFORMS ── */
+.platforms-section{
+  padding:80px 5%;background:var(--bg2);
+  border-top:1px solid var(--border);text-align:center;
+}
+.platform-grid{
+  display:flex;flex-wrap:wrap;justify-content:center;
+  gap:14px;max-width:720px;margin:0 auto;
+}
+.platform-badge{
+  display:flex;align-items:center;gap:10px;
+  background:var(--glass);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--glass-border);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  border-radius:10px;padding:13px 22px;font-size:0.84em;
+  transition:all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.platform-badge:hover{
+  border-color:rgba(255,255,255,0.15);
+  transform:scale(1.03);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+/* ── SOCIAL ── */
+.social-section{
+  padding:60px 5%;text-align:center;
+  border-top:1px solid var(--border);
+}
+.social-row{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;margin-top:24px;}
+.social-chip{
+  display:flex;align-items:center;gap:9px;
+  background:var(--glass);border:1px solid var(--glass-border);
+  border-radius:100px;padding:10px 20px;font-size:0.8em;
+  color:var(--text);opacity:0.75;position:relative;overflow:hidden;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+.social-chip:hover {
+  opacity: 1;
+  border-color: var(--green);
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.15);
+  transform: translateY(-2px);
+}
+.social-chip .soon-tag{
+  font-family:'Share Tech Mono',monospace;font-size:0.6em;
+  background:rgba(0,200,255,0.1);border:1px solid rgba(0,200,255,0.2);
+  color:var(--cyan);padding:2px 7px;border-radius:4px;margin-left:4px;
+}
+
+/* ── FORMS (shared) ── */
+.form-group{margin-bottom:16px;text-align:left;}
+.form-group label{
+  display:block;font-size:0.68em;color:var(--muted);
+  letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;
+}
+.form-group input,
+.form-group textarea,
+.form-group select{
+  width:100%;background:#060612;border:1px solid #181830;
+  color:#fff;padding:12px 14px;border-radius:8px;
+  font-family:'Space Grotesk',sans-serif;font-size:0.87em;
+  outline:none;transition:all 0.25s ease;
+}
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus{
+  border-color:var(--green);
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.2);
+}
+.form-group input.invalid,
+.form-group textarea.invalid,
+.form-group select.invalid{
+  border-color:var(--red);
+  box-shadow: 0 0 10px rgba(255, 51, 85, 0.2);
+}
+.form-group textarea{min-height:90px;resize:vertical;}
+.form-group select option{background:#0d0d1e;}
+.radio-group{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
+.radio-group label{
+  display:flex;align-items:center;gap:10px;
+  font-size:0.82em;color:var(--text);
+  text-transform:none;letter-spacing:0;cursor:pointer;
+}
+.radio-group input[type=radio],
+.radio-group input[type=checkbox]{width:auto;padding:0;accent-color:var(--green);}
+
+/* ── REVIEWS SECTION ── */
+.reviews-section{
+  padding:80px 5%;background:var(--bg);
+  border-top:1px solid var(--border);text-align:center;
+}
+.reviews-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));
+  gap:20px;max-width:1000px;margin:32px auto 0;
+}
+.review-card{
+  background:var(--glass);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--glass-border);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+  border-radius:12px;padding:24px;text-align:left;
+  transition:all 0.25s cubic-bezier(0.16, 1, 0.3, 1);position:relative;
+}
+.review-card:hover{
+  border-color:var(--border2);transform:translateY(-3px);
+  box-shadow:0 10px 30px rgba(0,0,0,0.45);
+}
+.review-stars{color:#ffbb00;font-size:0.95rem;margin-bottom:12px;}
+.review-text{font-size:0.82em;color:var(--text);opacity:0.9;line-height:1.7;margin-bottom:14px;font-style:italic;}
+.review-author{
+  font-family:'Share Tech Mono',monospace;font-size:0.75em;
+  color:var(--green);letter-spacing:1px;display:flex;align-items:center;gap:6px;
+}
+.review-author::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);}
+.form-submit{
+  width:100%;background:rgba(0,255,136,0.09);
+  border:1px solid var(--green);color:var(--green);
+  padding:14px;border-radius:8px;
+  font-family:'Space Grotesk',sans-serif;font-size:0.86em;
+  letter-spacing:2px;cursor:pointer;text-transform:uppercase;
+  transition:all 0.2s;margin-top:6px;
+}
+.form-submit:hover{background:rgba(0,255,136,0.18);box-shadow:0 0 22px rgba(0,255,136,0.22);}
+.form-submit:disabled{opacity:0.4;cursor:not-allowed;}
+.form-success{
+  display:none;color:var(--green);
+  font-family:'Share Tech Mono',monospace;font-size:0.88em;margin-top:16px;
+  background:rgba(0,255,136,0.06);border:1px solid rgba(0,255,136,0.2);
+  border-radius:8px;padding:14px;
+}
+
+/* ── CARD WRAPPERS ── */
+.big-card{
+  max-width:680px;margin:0 auto;
+  background:var(--glass);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--glass-border);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+  border-radius:16px;padding:36px;
+}
+.big-card h2{
+  font-family:'Zen Dots',sans-serif;color:#fff;
+  font-size:1.3rem;letter-spacing:2px;margin-bottom:10px;
+}
+.big-card .card-sub{color:var(--muted);font-size:0.83em;margin-bottom:28px;line-height:1.75;}
+
+/* Tab system */
+.tab-bar{
+  display:flex;gap:0;margin-bottom:28px;
+  background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:10px;overflow:hidden;
+}
+.tab-btn{
+  flex:1;padding:11px 8px;background:transparent;
+  border:none;color:var(--muted);font-family:'Space Grotesk',sans-serif;
+  font-size:0.78em;letter-spacing:1px;text-transform:uppercase;cursor:pointer;
+  transition:all 0.2s;border-right:1px solid var(--border);
+}
+.tab-btn:last-child{border-right:none;}
+.tab-btn.active{background:rgba(0,255,136,0.1);color:var(--green);}
+.tab-pane{display:none;}
+.tab-pane.active{display:block;}
+
+/* Divider */
+.divider{height:1px;background:var(--border);margin:24px 0;}
+
+/* ── BETA SECTION ── */
+.beta-section{padding:80px 5%;text-align:center;}
+.beta-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:20px;max-width:960px;margin:0 auto;
+}
+
+/* ── Q&A SECTION ── */
+.qa-section{
+  padding:80px 5%;background:var(--bg2);
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  text-align:center;
+}
+
+/* ── DEV TEAM SECTION ── */
+.devteam-section{padding:80px 5%;text-align:center;}
+
+/* ── TOAST NOTIFICATIONS ── */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10005;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+.toast {
+  pointer-events: auto;
+  width: 320px;
+  background: rgba(10, 10, 22, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--green);
+  border-radius: 8px;
+  padding: 16px 20px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.55), 0 0 15px rgba(0, 255, 136, 0.05);
+  color: var(--text);
+  font-size: 0.86em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transform: translateX(120%);
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.45s ease;
+  opacity: 0;
+}
+.toast.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+.toast-success { border-left-color: var(--green); }
+.toast-error { border-left-color: var(--red); box-shadow: 0 10px 40px rgba(0,0,0,0.55), 0 0 15px rgba(255, 51, 85, 0.05); }
+.toast-warning { border-left-color: var(--orange); }
+.toast-info { border-left-color: var(--cyan); }
+.toast-message { flex: 1; padding-right: 10px; line-height: 1.5; }
+.toast-close {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1.2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
+}
+.toast-close:hover { color: #fff; }
+
+/* ── FOOTER ── */
+footer{
+  border-top:1px solid var(--border);
+  padding:36px 5%;text-align:center;
+}
+.footer-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:14px;}
+.footer-logo img{height:28px;filter:drop-shadow(0 0 6px rgba(0,255,136,0.35));}
+.footer-logo span{
+  font-family:'Zen Dots',sans-serif;color:var(--green);
+  font-size:0.95rem;letter-spacing:2px;
+}
+.footer-tagline{
+  color:var(--muted);font-size:0.78em;letter-spacing:1px;margin-bottom:8px;
+}
+.footer-copy{color:#3a3a55;font-size:0.68em;letter-spacing:1px;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:640px){
+  .nav-links, .nav-cta {display:none;}
+  .nav-hamburger {display:flex;}
+  .big-card{padding:22px;}
+  .tab-btn{font-size:0.65em;padding:10px 4px;}
+  .ambient-glow {width: 280px; height: 280px; filter: blur(90px);}
+}
+
+/* ═══ DONATION SECTION ═══ */
+.donation-section {
+  padding: clamp(60px,8vw,110px) clamp(16px,5vw,80px);
+  text-align: center;
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Tab Switcher */
+.don-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 32px auto 28px;
+  background: rgba(10,10,22,0.6);
+  border: 1px solid var(--border2);
+  border-radius: 50px;
+  padding: 6px;
+  width: fit-content;
+  backdrop-filter: blur(12px);
+}
+.don-tab {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.9em;
+  font-weight: 600;
+  padding: 10px 28px;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+}
+.don-tab span { margin-right: 6px; }
+.don-tab:hover { color: #fff; }
+.don-tab.active {
+  background: linear-gradient(135deg, rgba(0,255,136,0.18), rgba(0,200,255,0.12));
+  color: var(--green);
+  border: 1px solid rgba(0,255,136,0.3);
+  box-shadow: 0 0 20px rgba(0,255,136,0.12);
+}
+
+/* Panel toggle */
+.don-panel { display: block; }
+.don-panel.hidden { display: none; }
+
+/* ── CRYPTO GRID ── */
+.don-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+  text-align: left;
+}
+
+.don-card {
+  background: rgba(10,10,22,0.7);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  padding: 18px 18px 14px;
+  transition: border-color 0.3s, box-shadow 0.3s, transform 0.25s;
+  backdrop-filter: blur(10px);
+}
+.don-card:hover {
+  border-color: rgba(0,255,136,0.25);
+  box-shadow: 0 0 24px rgba(0,255,136,0.07);
+  transform: translateY(-2px);
+}
+
+.don-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.don-coin-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3em;
+  font-weight: 800;
+  flex-shrink: 0;
+  border: 2px solid;
+}
+.usdt-color { color: #26a17b; border-color: rgba(38,161,123,0.4); background: rgba(38,161,123,0.1); }
+.usdc-color { color: #2775ca; border-color: rgba(39,117,202,0.4); background: rgba(39,117,202,0.1); }
+.bnb-color  { color: #f0b90b; border-color: rgba(240,185,11,0.4); background: rgba(240,185,11,0.08); }
+.btc-color  { color: #f7931a; border-color: rgba(247,147,26,0.4); background: rgba(247,147,26,0.08); }
+
+.don-coin-name {
+  font-family: 'Zen Dots', sans-serif;
+  font-size: 0.95em;
+  color: #fff;
+  letter-spacing: 1px;
+}
+.don-coin-net {
+  font-size: 0.72em;
+  color: var(--muted);
+  margin-top: 2px;
+  letter-spacing: 0.3px;
+}
+
+/* Network badges */
+.don-badge {
+  margin-left: auto;
+  font-size: 0.62em;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-family: 'Share Tech Mono', monospace;
+  flex-shrink: 0;
+}
+.don-badge.trc20  { background: rgba(38,161,123,0.15); color: #26a17b; border:1px solid rgba(38,161,123,0.3); }
+.don-badge.sol    { background: rgba(153,69,255,0.15); color: #9945ff; border:1px solid rgba(153,69,255,0.3); }
+.don-badge.erc20  { background: rgba(98,126,234,0.15); color: #627eea; border:1px solid rgba(98,126,234,0.3); }
+.don-badge.bep20  { background: rgba(240,185,11,0.12); color: #f0b90b; border:1px solid rgba(240,185,11,0.3); }
+.don-badge.btc    { background: rgba(247,147,26,0.12); color: #f7931a; border:1px solid rgba(247,147,26,0.3); }
+.don-badge.segwit { background: rgba(0,200,255,0.12); color: var(--cyan); border:1px solid rgba(0,200,255,0.3); }
+
+/* Address row */
+.don-address-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  overflow: hidden;
+}
+.don-address {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.72em;
+  color: var(--cyan);
+  word-break: break-all;
+  flex: 1;
+  line-height: 1.4;
+  letter-spacing: 0.3px;
+}
+.don-copy-btn {
+  background: rgba(0,255,136,0.1);
+  border: 1px solid rgba(0,255,136,0.25);
+  color: var(--green);
+  border-radius: 6px;
+  padding: 5px 9px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.don-copy-btn:hover {
+  background: rgba(0,255,136,0.25);
+  box-shadow: 0 0 12px rgba(0,255,136,0.2);
+}
+.don-copy-btn.copied {
+  background: rgba(0,255,136,0.3);
+  color: #fff;
+  border-color: var(--green);
+}
+
+.don-crypto-note {
+  margin-top: 24px;
+  font-size: 0.82em;
+  color: var(--muted);
+  background: rgba(0,255,136,0.04);
+  border: 1px solid rgba(0,255,136,0.12);
+  border-radius: 10px;
+  padding: 12px 18px;
+  display: inline-block;
+}
+
+/* ── FIAT GRID ── */
+.don-fiat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  text-align: left;
+}
+.don-fiat-card {
+  background: rgba(10,10,22,0.7);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  padding: 28px 24px;
+  transition: border-color 0.3s, box-shadow 0.3s, transform 0.25s;
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.don-fiat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+.bmc-card:hover   { border-color: rgba(255,221,0,0.3); box-shadow: 0 0 28px rgba(255,221,0,0.07); }
+.mpesa-card:hover { border-color: rgba(0,175,0,0.3);   box-shadow: 0 0 28px rgba(0,175,0,0.08); }
+
+.don-fiat-icon {
+  font-size: 2.2em;
+  line-height: 1;
+}
+.mpesa-g {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #00af00, #00cc00);
+  border-radius: 50%;
+  color: #fff;
+  font-weight: 900;
+  font-family: 'Zen Dots', sans-serif;
+  font-size: 1.4em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(0,175,0,0.3);
+}
+.don-fiat-label {
+  font-family: 'Zen Dots', sans-serif;
+  font-size: 1em;
+  color: #fff;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.don-fiat-desc { font-size: 0.82em; color: var(--muted); line-height: 1.5; }
+.don-fiat-btn {
+  display: inline-block;
+  text-align: center;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.88em;
+  text-decoration: none;
+  transition: all 0.25s;
+  margin-top: 6px;
+  letter-spacing: 0.5px;
+}
+.bmc-btn {
+  background: linear-gradient(135deg, #ffdd00, #ff9900);
+  color: #1a1a00;
+  box-shadow: 0 4px 20px rgba(255,200,0,0.25);
+}
+.bmc-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(255,200,0,0.4);
+}
+
+/* M-Pesa info rows */
+.mpesa-info {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(0,175,0,0.2);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mpesa-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mpesa-lbl {
+  font-size: 0.7em;
+  color: var(--muted);
+  font-family: 'Share Tech Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  min-width: 50px;
+}
+.mpesa-val {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.85em;
+  color: #4ade80;
+  flex: 1;
+}
+
+/* PayPal soon */
+.don-soon-badge {
+  font-size: 0.6em;
+  background: rgba(255,150,0,0.15);
+  color: #ff9900;
+  border: 1px solid rgba(255,150,0,0.3);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-family: 'Share Tech Mono', monospace;
+  letter-spacing: 1px;
+  vertical-align: middle;
+}
+.paypal-btn-disabled {
+  background: rgba(30,30,50,0.6);
+  color: var(--muted);
+  border: 1px dashed var(--border2);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.88em;
+  font-weight: 600;
+  text-align: center;
+  padding: 12px 20px;
+  border-radius: 10px;
+  margin-top: 6px;
+}
+
+@media(max-width:640px) {
+  .don-grid { grid-template-columns: 1fr; }
+  .don-fiat-grid { grid-template-columns: 1fr; }
+  .don-address { font-size: 0.65em; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ SYSTEM UPDATE BANNER ═══ -->
+<div id="update-banner" style="
+  position:fixed;top:0;left:0;right:0;z-index:2000;
+  background:linear-gradient(90deg,rgba(255,153,0,0.18),rgba(255,51,85,0.14),rgba(255,153,0,0.18));
+  border-bottom:1px solid rgba(255,153,0,0.5);
+  padding:9px 20px;
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  backdrop-filter:blur(12px);
+  animation:banner-pulse 3s ease-in-out infinite;
+">
+  <span style="font-size:1rem;animation:blink 1.2s infinite;">⚠️</span>
+  <span style="font-family:'Share Tech Mono',monospace;font-size:0.78em;color:#ffbb55;letter-spacing:1px;text-align:center;">
+    <strong style="color:#ff9900;">SYSTEM UPDATE IN PROGRESS</strong> — Some features may be temporarily unavailable. We will notify all operators once the update is complete.
+  </span>
+  <button onclick="document.getElementById('update-banner').style.display='none'" style="background:transparent;border:none;color:rgba(255,153,0,0.6);cursor:pointer;font-size:1.1rem;padding:0 4px;margin-left:8px;transition:color 0.2s;" title="Dismiss">✕</button>
+</div>
+<style>
+@keyframes banner-pulse {
+  0%,100%{background:linear-gradient(90deg,rgba(255,153,0,0.18),rgba(255,51,85,0.14),rgba(255,153,0,0.18));}
+  50%{background:linear-gradient(90deg,rgba(255,153,0,0.26),rgba(255,51,85,0.2),rgba(255,153,0,0.26));}
+}
+/* Push nav below banner */
+nav { top: 40px !important; }
+.hero { padding-top: 160px !important; }
+@media(max-width:640px){
+  #update-banner span:nth-child(2){font-size:0.68em;}
+  nav{top:52px !important;}
+}
+</style>
+
+<!-- Ambient Neon Glow Blobs -->
+<div class="ambient-glow glow-green"></div>
+<div class="ambient-glow glow-cyan"></div>
+<div class="ambient-glow glow-purple"></div>
+
+<canvas id="matrix-canvas"></canvas>
+
+<!-- ═══ NAV ═══ -->
+<nav>
+  <a href="#" class="nav-brand">
+    <img src="assets/aether_emoji.png" alt="Aether Ghost OS Logo">
+    <span class="nav-brand-text">AETHER GHOST OS</span>
+  </a>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#threats">Threats</a>
+    <a href="#reviews">Reviews</a>
+    <a href="#careers">Careers</a>
+    <a href="https://github.com/AETHERGHOSTOS/ghost-mode" target="_blank">GitHub</a>
+    <a href="#donate" style="color:var(--green);font-weight:700;text-shadow:0 0 10px rgba(0,255,136,0.4);">Donate ♥</a>
+  </div>
+  <a href="#careers" class="nav-cta">Join Careers</a>
+  
+  <button class="nav-hamburger" id="nav-hamburger" aria-label="Toggle Navigation" onclick="toggleMobileNav()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+</nav>
+
+<!-- ═══ MOBILE NAV DRAWER ═══ -->
+<div class="mobile-nav" id="mobile-nav">
+  <a href="#features" onclick="toggleMobileNav()">Features</a>
+  <a href="#threats" onclick="toggleMobileNav()">Threats</a>
+  <a href="#reviews" onclick="toggleMobileNav()">Reviews</a>
+  <a href="#careers" onclick="toggleMobileNav()">Careers</a>
+  <a href="#donate" onclick="toggleMobileNav()" style="color:var(--green);font-weight:700;">Donate ♥</a>
+  <a href="#careers" class="nav-cta" onclick="toggleMobileNav()">Join Careers</a>
+</div>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="hero-badge">v1.1.0 — Active Threat Shield Online</div>
+
+  <div class="hero-logo">
+    <div class="orbit"><div class="orbit-dot"></div></div>
+    <div class="orbit2"><div class="orbit2-dot"></div></div>
+    <img src="assets/logo.png" alt="Aether Ghost OS">
+  </div>
+
+  <h1>Ghost the <span class="g">Grid.</span><br>Own Your <span class="c">Privacy.</span></h1>
+  <p class="hero-sub">
+    A sovereign, unified privacy ecosystem protecting your data and network activity across mobile, desktop, and secure hardware configurations. Multi-layered defense. Real-time threat intelligence. Zero subscriptions.
+    <br><span style="color:var(--cyan);font-size:0.85em;display:inline-block;margin-top:8px;letter-spacing:1px;">⚡ PC Workstation &amp; Custom Firmware Beta active · iOS Client Coming Soon</span>
+  </p>
+
+  <div class="hero-actions">
+    <a href="#careers" class="btn-primary">🧪 Explore Careers</a>
+    <a href="#features" class="btn-secondary">Explore the Shield</a>
+  </div>
+</section>
+
+<!-- ═══ STATS ═══ -->
+<div class="stats">
+  <div class="stat-item">
+    <span class="stat-num" id="c-threats">0</span>
+    <span class="stat-label">Threat Types Monitored</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num" id="c-shields">0</span>
+    <span class="stat-label">Shield Layers</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num" id="c-platforms">0</span>
+    <span class="stat-label">Platforms Supported</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">NO ROOT</span>
+    <span class="stat-label">Required</span>
+  </div>
+</div>
+
+<!-- ═══ FEATURES ═══ -->
+<section class="features reveal" id="features">
+  <div style="text-align:center;margin-bottom:20px;">
+    <div class="section-label">Core Shield Modules</div>
+    <h2 class="section-title">Every Layer. Every Threat.</h2>
+    <p class="section-sub">Aether Ghost OS runs 11 intelligent security modules silently in the background — monitoring, detecting, and neutralising threats before they reach you.</p>
+  </div>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🛡️</div>
+      <h3>Identity Protection</h3>
+      <p>Hides your location and IP address globally. Uses secure multi-hop encryption to keep your connection completely invisible.</p>
+      <span class="feature-tag tag-live">✅ LIVE</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔒</div>
+      <h3>Secure Connection Shield</h3>
+      <p>Constantly monitors your network connection to stop snoopers from intercepting or reading your active data traffic.</p>
+      <span class="feature-tag tag-live">✅ LIVE</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎙️</div>
+      <h3>Camera &amp; Mic Sentry</h3>
+      <p>Alerts you instantly if any background app secretly attempts to turn on your camera or microphone without your permission.</p>
+      <span class="feature-tag tag-live">✅ LIVE</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🐝</div>
+      <h3>Attacker Trap (Decoy)</h3>
+      <p>Creates a fake decoy environment that traps attackers scanning your device, logging their details and blocking them permanently.</p>
+      <span class="feature-tag tag-live">✅ LIVE</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔁</div>
+      <h3>Safe-Connection Backup</h3>
+      <p>If your private connection drops unexpectedly, the system instantly switches to a backup route to prevent your real identity from leaking.</p>
+      <span class="feature-tag tag-live">✅ LIVE</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🌐</div>
+      <h3>Fake Website Filter</h3>
+      <p>Checks your connection paths to ensure you aren't redirected to fake copycat websites designed to steal your credentials.</p>
+      <span class="feature-tag tag-live">✅ LIVE</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🌍</div>
+      <h3>Country Switcher</h3>
+      <p>Choose where you want to appear online. Easily switch your location between the USA, Germany, Japan, and 12+ other countries.</p>
+      <span class="feature-tag tag-live">✅ LIVE</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <h3>Live Control Center</h3>
+      <p>A premium control panel showing live connection logs, system safety scores, and a one-tap emergency safety wipe button.</p>
+      <span class="feature-tag tag-live">✅ LIVE</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📱</div>
+      <h3>Sovereign Privacy Ecosystem</h3>
+      <p>We are building a complete privacy ecosystem under one roof, including a custom mobile app, a full-device VPN system, and a private browser.</p>
+      <span class="feature-tag tag-soon">🔵 COMING SOON</span>
+    </div>
+  </div>
+  <p style="text-align:center;color:var(--muted);font-size:0.82em;margin-top:32px;letter-spacing:1px;max-width:620px;margin-left:auto;margin-right:auto;line-height:1.75;border-top:1px dashed var(--border);padding-top:20px;">
+    🔮 <strong style="color:var(--green)">The digital grid never stands still, and neither do we.</strong> Exciting new features are coming — including advanced system-level shields, smart decoy assets, and hardware isolation layers. The best is yet to come!
+  </p>
+</section>
+
+<!-- ═══ THREATS ═══ -->
+<section class="threats-section reveal" id="threats">
+  <div style="text-align:center;margin-bottom:40px;">
+    <div class="section-label">What We Stop</div>
+    <h2 class="section-title">Threats We Handle</h2>
+    <p class="section-sub">Every scan sweeps across network, hardware, process, DNS, and firewall layers — simultaneously.</p>
+  </div>
+
+  <div class="threat-list">
+    <div class="threat-row">
+      <div class="threat-icon">🎭</div>
+      <div class="threat-content">
+        <h4>Data Snooping</h4>
+        <p>Snoopers on the same public Wi-Fi try to copy your password and history. Aether blocks this interception immediately and warns you.</p>
+      </div>
+      <div class="threat-status status-blocked">BLOCKED</div>
+    </div>
+    <div class="threat-row">
+      <div class="threat-icon">🔍</div>
+      <div class="threat-content">
+        <h4>Device Scanning</h4>
+        <p>When attackers scan your device looking for vulnerabilities, our system traps them in a decoy environment, records their info, and shuts them out.</p>
+      </div>
+      <div class="threat-status status-neutralized">NEUTRALISED</div>
+    </div>
+    <div class="threat-row">
+      <div class="threat-icon">📷</div>
+      <div class="threat-content">
+        <h4>Spyware Recordings</h4>
+        <p>Malicious background apps secretly turning on your camera or microphone. Aether alerts you instantly the moment they try.</p>
+      </div>
+      <div class="threat-status status-detected">DETECTED</div>
+    </div>
+    <div class="threat-row">
+      <div class="threat-icon">☠️</div>
+      <div class="threat-content">
+        <h4>Fake Bank Redirects</h4>
+        <p>Rogue networks redirecting you to fake pages (like fake bank websites) to steal your info. Aether verifies every site link is real.</p>
+      </div>
+      <div class="threat-status status-blocked">VERIFIED</div>
+    </div>
+    <div class="threat-row">
+      <div class="threat-icon">📡</div>
+      <div class="threat-content">
+        <h4>Dangerous Public Wi-Fi</h4>
+        <p>Unsafe public hotspots designed to trap users. Aether immediately triggers a warning and automatically turns on full location-hiding shields.</p>
+      </div>
+      <div class="threat-status status-detected">ALERTED</div>
+    </div>
+    <div class="threat-row">
+      <div class="threat-icon">🔒</div>
+      <div class="threat-content">
+        <h4>Real Location Leaks</h4>
+        <p>If your secure VPN/Tor connection drops, your true location can leak for a split second. Aether plugs the gap automatically with backup routing.</p>
+      </div>
+      <div class="threat-status status-blocked">FAILOVER ACTIVE</div>
+    </div>
+  </div>
+  <p style="text-align:center;color:var(--muted);font-size:0.82em;margin-top:32px;letter-spacing:1px;max-width:620px;margin-left:auto;margin-right:auto;line-height:1.75;border-top:1px dashed var(--border);padding-top:20px;">
+    🚀 <strong style="color:var(--cyan)">This is only the foundation.</strong> Much better protective measures are coming — including automated network block rules, randomized hardware address cloaking, and direct internet provider bypass methods. Your device is about to become invisible to snoopers.
+  </p>
+</section>
+
+<!-- ═══ HOW IT WORKS ═══ -->
+<section class="how-section reveal">
+  <div class="section-label">Quick Start</div>
+  <h2 class="section-title">Up and Running in Minutes</h2>
+  <p class="section-sub">No complex configuration. No IT degree required.</p>
+
+  <div class="steps-grid">
+    <div class="step">
+      <div class="step-num">01</div>
+      <h3>Run the Installer</h3>
+      <p>One setup script installs every dependency — Python, Tor, Nmap, and the Ghost OS background daemon.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <h3>Launch Ghost Menu</h3>
+      <p>Run <code style="color:var(--green);font-family:monospace;font-size:0.9em">bash ghost.sh</code> to access the interactive security console in your terminal.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <h3>Choose Your Engine</h3>
+      <p>Select Tor, Cloudflare WARP, or rotating proxy. The daemon manages failovers automatically while you stay invisible.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PLATFORMS ═══ -->
+<section class="platforms-section reveal" id="platforms">
+  <div class="section-label">Cross-Platform Security</div>
+  <h2 class="section-title">Works on Your Devices</h2>
+  <p class="section-sub" style="margin-bottom:36px;">No special hardware required. Compatible with standard systems, mobile terminals, and privacy-hardened operating systems.</p>
+  <div class="platform-grid">
+    <div class="platform-badge">📱 Android (GrapheneOS / CalyxOS / Stock / Termux)</div>
+    <div class="platform-badge" style="border: 1px dashed rgba(255, 51, 85, 0.35); background: rgba(255, 51, 85, 0.02);" title="Dedicated native client app and VPN profile gateways are currently in active design.">🍎 iPhone / iOS (Aether Mobile Suite Coming Soon)</div>
+    <div class="platform-badge">🐧 Linux (Kali / Parrot / Ubuntu / Arch / Alpine / BSD)</div>
+    <div class="platform-badge">🪟 Windows 10 / 11 (Native &amp; WSL)</div>
+    <div class="platform-badge">🍎 macOS</div>
+    <div class="platform-badge">☁️ VPS / Edge Cloud / Headless Servers</div>
+  </div>
+  <p style="font-size:0.75em;color:var(--muted);margin-top:24px;max-width:620px;margin-left:auto;margin-right:auto;line-height:1.6;">
+    ℹ️ <strong>OS Architecture Note:</strong> While our security daemon and installer scripts run natively in terminal environments (including Android Termux, Linux, macOS, and Windows), native iOS does not allow background terminal processes. We are actively designing a custom iOS client app that uses VPN profile tunneling to provide similar security without needing a jailbreak.
+  </p>
+</section>
+
+<!-- ═══ PUBLIC REVIEWS & COMMENTS ═══ -->
+<section class="reviews-section reveal" id="reviews">
+  <div class="section-label">Operator Board</div>
+  <h2 class="section-title">Public Reviews &amp; Comments</h2>
+  <p class="section-sub">Read reviews from real operators or leave your own comment and rating below. Updates live instantly.</p>
+
+  <!-- Dynamic Reviews Feed -->
+  <div class="reviews-grid" id="public-reviews-feed">
+    <!-- Rendered dynamically by JS. Fallback placeholder if empty. -->
+  </div>
+
+  <div class="divider" style="max-width:800px; margin: 40px auto;"></div>
+
+  <!-- Public Review Form Card -->
+  <div class="big-card" style="max-width: 680px; background: rgba(10, 10, 22, 0.4); border-color: var(--border);">
+    <h3 style="font-family:'Zen Dots',sans-serif; color: #fff; font-size: 1.15rem; letter-spacing: 2px; margin-bottom: 8px; text-align: center;">✍️ Write a Review</h3>
+    <p class="card-sub" style="text-align: center; margin-bottom: 24px;">Share your experience or ask a question. Please do not post confidential logs.</p>
+
+    <form id="public-review-form" onsubmit="submitPublicReview(event)">
+      <div class="form-group">
+        <label>Your Name / Operator Tag</label>
+        <input type="text" id="pub-review-name" placeholder="e.g. Ghost Operator" required>
+      </div>
+
+      <div class="form-group">
+        <label>Star Rating</label>
+        <div class="star-rating" id="pub-star-rating">
+          <button type="button" class="star-btn" onclick="setPubStarRating(1)" data-star="1" aria-label="1 Star">★</button>
+          <button type="button" class="star-btn" onclick="setPubStarRating(2)" data-star="2" aria-label="2 Stars">★</button>
+          <button type="button" class="star-btn" onclick="setPubStarRating(3)" data-star="3" aria-label="3 Stars">★</button>
+          <button type="button" class="star-btn" onclick="setPubStarRating(4)" data-star="4" aria-label="4 Stars">★</button>
+          <button type="button" class="star-btn" onclick="setPubStarRating(5)" data-star="5" aria-label="5 Stars">★</button>
+        </div>
+        <input type="hidden" id="pub-review-rating" value="">
+      </div>
+
+      <div class="form-group">
+        <label>Your Comment / Review</label>
+        <textarea id="pub-review-text" placeholder="What do you think about Aether Ghost OS? Leave your comment, ideas, or feedback here..." required style="min-height: 100px;"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Contact Info (Optional — if you want us to reply)</label>
+        <select id="pub-contact-type" onchange="updateContactPlaceholder('pub')">
+          <option value="none">Do Not Reply (Anonymous)</option>
+          <option value="telegram">Telegram</option>
+          <option value="discord">Discord</option>
+          <option value="signal">Signal / Phone</option>
+          <option value="email">Email</option>
+        </select>
+      </div>
+      
+      <div class="form-group" id="pub-contact-handle-group" style="display: none;">
+        <label id="pub-contact-label">Telegram Username</label>
+        <input type="text" id="pub-contact-handle" placeholder="e.g. @aether_operator">
+      </div>
+
+      <button type="submit" class="form-submit">⭐ Post Review</button>
+      <div class="form-success" id="pub-review-success">
+        ✅ Review posted successfully! Thank you for your feedback.
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- ═══ PUBLIC Q&A ═══ -->
+<section class="qa-section reveal" id="qa">
+  <div class="section-label">Open Questions</div>
+  <h2 class="section-title">Ask Us Anything</h2>
+  <p class="section-sub">Curious about how something works? Want to know if Aether Ghost OS is right for you? Send your question and we'll reply directly.</p>
+
+  <div class="big-card">
+    <h2>Drop Your Question</h2>
+    <p class="card-sub">No account needed. No sign-up. Just your question — we'll reply to your stated channel.</p>
+
+    <form id="qa-form" onsubmit="submitQA(event)">
+      <div class="form-group">
+        <label>Your Name / Operator Tag (optional)</label>
+        <input type="text" id="qa-name" placeholder="Anonymous Ghost">
+      </div>
+      
+      <!-- Reply/Contact channel choice -->
+      <div class="form-group">
+        <label>Where should we reply? (Preferred Contact Method)</label>
+        <select id="qa-contact-type" onchange="updateContactPlaceholder('qa')" required>
+          <option value="telegram">Telegram (Recommended)</option>
+          <option value="discord">Discord</option>
+          <option value="signal">Signal / Phone Number</option>
+          <option value="email">Email</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label id="qa-contact-label">Telegram Username</label>
+        <input type="text" id="qa-contact-handle" placeholder="e.g. @aether_curious" required>
+        <span style="font-size:0.72em;color:var(--muted);display:block;margin-top:4px;">We'll reach out directly with your answer.</span>
+      </div>
+
+      <div class="form-group">
+        <label>Your Question</label>
+        <textarea id="qa-msg" placeholder="e.g. Does this work on GrapheneOS? Can I use this without Termux? Will this protect me on hotel Wi-Fi?..." required style="min-height:120px;"></textarea>
+      </div>
+      <button type="submit" class="form-submit">📨 Send Question</button>
+      <div class="form-success" id="qa-success">
+        ✅ Question received! We'll get back to you on your chosen contact handle as soon as possible.
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- ═══ GHOST CAREERS ═══ -->
+<section class="devteam-section reveal" id="careers">
+  <div class="section-label">Ghost Careers</div>
+  <h2 class="section-title">Join the Collective</h2>
+  <p class="section-sub" style="margin-bottom:40px;">We are building the future of decentralized digital sovereignty. Choose your track to apply. More roles are loading...</p>
+  
+  <!-- Detailed Vision/Roadmap card -->
+  <div class="big-card" style="max-width: 840px; text-align: left; margin: 0 auto 40px; border: 1px solid var(--border2); background: rgba(10, 10, 22, 0.65);">
+    <h3 style="font-family:'Zen Dots',sans-serif; color: #fff; font-size: 1.25rem; letter-spacing: 2px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">💀 Aether Ghost OS Mission</h3>
+    <div style="font-size: 0.86em; color: var(--text); line-height: 1.8; display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 18px;">
+      <div>
+        <p style="margin-bottom: 14px;"><strong style="color:var(--green)">Who We Are:</strong> We are a decentralized, privacy-focused collective of developers, security researchers, and system auditors. We believe that privacy is not a luxury, but a fundamental human right.</p>
+        <p><strong style="color:var(--green)">What We Do:</strong> We construct zero-compromise security daemons, active decoy environments (tarpits), and physical access monitoring layers to shield user data from state-level monitoring and rogue network snooping.</p>
+      </div>
+      <div>
+        <p style="margin-bottom: 14px;"><strong style="color:var(--cyan)">What We Are Planning:</strong></p>
+        <ul style="list-style-type: none; padding-left: 0; display: flex; flex-direction: column; gap: 10px;">
+          <li>🛡️ <strong>Hardened ROM Installer:</strong> Automated bash/python scripts to flash or root Aether directly into system cores (like GrapheneOS).</li>
+          <li>🌐 <strong>Custom VPN &amp; SOCKS5:</strong> Launching our private, encrypted VPN gateways and high-speed rotating proxy structures.</li>
+          <li>🧭 <strong>Aether Privacy Browser:</strong> A sandboxed web explorer with zero finger-printing and built-in Tor/I2P routing networks.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width: 840px; margin: 0 auto;">
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('dev-career',this)" id="tab-dev-career">💻 Core Developer</button>
+      <button class="tab-btn" onclick="switchTab('tester-career',this)" id="tab-tester-career">🧪 Beta Tester / Reviewer</button>
+    </div>
+
+    <!-- PANE: DEVELOPER CAREER -->
+    <div class="tab-pane active" id="pane-dev-career">
+      <div class="big-card" style="max-width:100%; text-align:left;">
+        <h2>Apply for Developer Access</h2>
+        <p class="card-sub" style="margin-bottom:24px;">
+          Tell us who you are, what skills you bring, and where you want to help us develop Aether Ghost OS.
+        </p>
+
+        <form id="dev-form" onsubmit="submitDev(event)">
+          <div class="form-group">
+            <label>Your Name / Operator Tag</label>
+            <input type="text" id="dev-name" placeholder="Ghost Operator" required>
+          </div>
+
+          <!-- Reply/Contact channel choice -->
+          <div class="form-group">
+            <label>Where should we reply? (Preferred Contact Method)</label>
+            <select id="dev-contact-type" onchange="updateContactPlaceholder('dev')" required>
+              <option value="telegram">Telegram (Recommended)</option>
+              <option value="discord">Discord</option>
+              <option value="signal">Signal / Phone Number</option>
+              <option value="email">Email</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label id="dev-contact-label">Telegram Username</label>
+            <input type="text" id="dev-contact-handle" placeholder="e.g. @aether_dev" required>
+            <span style="font-size:0.72em;color:var(--muted);display:block;margin-top:4px;">We'll reach out directly to coordinate your onboarding.</span>
+          </div>
+
+          <!-- DEVELOPING TRACK SPECIFIC FIELDS -->
+          <div class="form-group">
+            <label>GitHub Profile / Project Portfolio</label>
+            <input type="text" id="dev-github" placeholder="https://github.com/yourusername">
+          </div>
+          
+          <div class="form-group">
+            <label>Your Primary Focus / Intended Role</label>
+            <select id="dev-role" required>
+              <option value="">Select your main focus area...</option>
+              <option>Python / Backend Daemon / Automation</option>
+              <option>Android / Termux / Custom ROM Integrations</option>
+              <option>Network Security / Port Sentry / Honeypots</option>
+              <option>UI / UX / Frontend Web Dashboards</option>
+              <option>Linux Systems Engineering / Package Maintenance</option>
+              <option>Cryptographic / Anonymity Protocols</option>
+              <option>Security Research &amp; Vulnerability Disclosure</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Your Skills (Select all that apply)</label>
+            <div class="radio-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px;">
+              <label><input type="checkbox" name="dev_skill" value="python"> Python / Backend Scripting</label>
+              <label><input type="checkbox" name="dev_skill" value="bash"> Bash / Command Line tools</label>
+              <label><input type="checkbox" name="dev_skill" value="network"> Tor Circuits / SOCKS5 Protocols</label>
+              <label><input type="checkbox" name="dev_skill" value="vpn"> VPN Gateways / Tunneling Setup</label>
+              <label><input type="checkbox" name="dev_skill" value="android"> Android Internals / ROM builds</label>
+              <label><input type="checkbox" name="dev_skill" value="termux"> Termux API &amp; Environment</label>
+              <label><input type="checkbox" name="dev_skill" value="audit"> Security Auditing &amp; Honeypots</label>
+              <label><input type="checkbox" name="dev_skill" value="frontend"> Frontend Dashboards (CSS/JS)</label>
+              <label><input type="checkbox" name="dev_skill" value="systems"> Low-Level Systems (Rust/C++)</label>
+              <label><input type="checkbox" name="dev_skill" value="crypto"> Cryptographic protocols</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Where did you learn your skills?</label>
+            <div class="radio-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px;">
+              <label><input type="checkbox" name="dev_learn" value="self" onchange="toggleSelfTaughtSrc(this)"> Self-Taught (YouTube, docs, etc.)</label>
+              <label><input type="checkbox" name="dev_learn" value="friend" onchange="toggleFriendTaughtSrc(this)"> Friend-Taught / Mentor</label>
+              <label><input type="checkbox" name="dev_learn" value="university" onchange="toggleSchoolTaughtSrc(this)"> University / School</label>
+              <label><input type="checkbox" name="dev_learn" value="bootcamp" onchange="toggleBootcampTaughtSrc(this)"> Coding Bootcamp / Seminar</label>
+              <label><input type="checkbox" name="dev_learn" value="work" onchange="toggleWorkSrc(this)"> Work Experience / On-the-job</label>
+              <label><input type="checkbox" name="dev_learn" value="ctf" onchange="toggleCtfSrc(this)"> Cyber Wargames / CTF</label>
+              <label><input type="checkbox" name="dev_learn" value="cert" onchange="toggleCertSrc(this)"> Industry Certs (OSCP, Sec+, etc.)</label>
+              <label><input type="checkbox" name="dev_learn" value="opensource" onchange="toggleOpenSourceSrc(this)"> Open Source / Community Projects</label>
+            </div>
+          </div>
+
+          <!-- Hidden input for Self-Taught source details -->
+          <div class="form-group" id="self-taught-src-group" style="display:none; padding-left: 15px; border-left: 2px solid var(--green); margin-bottom: 20px; margin-top: 10px;">
+            <label>Specify where you learned (Self-Taught Sources)</label>
+            <textarea id="dev-learn-self-details" placeholder="e.g. YouTube channels, official documentation, blogs, GitHub codebases, online tutorials..."></textarea>
+          </div>
+
+          <!-- Hidden input for Friend-Taught details -->
+          <div class="form-group" id="friend-taught-src-group" style="display:none; padding-left: 15px; border-left: 2px solid var(--green); margin-bottom: 20px; margin-top: 10px;">
+            <label>Friend's Name / Handle (Optional)</label>
+            <input type="text" id="dev-learn-friend-details" placeholder="e.g. @operator_friend or name (helps us coordinate references)">
+          </div>
+
+          <!-- Hidden input for School details -->
+          <div class="form-group" id="school-taught-src-group" style="display:none; padding-left: 15px; border-left: 2px solid var(--green); margin-bottom: 20px; margin-top: 10px;">
+            <label>School / University / College Name</label>
+            <input type="text" id="dev-learn-school-details" placeholder="e.g. Stanford University, local college, or high school name">
+          </div>
+
+          <!-- Hidden input for Bootcamp details -->
+          <div class="form-group" id="bootcamp-taught-src-group" style="display:none; padding-left: 15px; border-left: 2px solid var(--green); margin-bottom: 20px; margin-top: 10px;">
+            <label>Bootcamp / Seminar Name</label>
+            <input type="text" id="dev-learn-bootcamp-details" placeholder="e.g. Hack Reactor, General Assembly, Cybrary...">
+          </div>
+
+          <!-- Hidden input for Work details -->
+          <div class="form-group" id="work-taught-src-group" style="display:none; padding-left: 15px; border-left: 2px solid var(--green); margin-bottom: 20px; margin-top: 10px;">
+            <label>Company Name &amp; Role (Optional)</label>
+            <input type="text" id="dev-learn-work-details" placeholder="e.g. Security Analyst at ACME Corp">
+          </div>
+
+          <!-- Hidden input for CTF details -->
+          <div class="form-group" id="ctf-taught-src-group" style="display:none; padding-left: 15px; border-left: 2px solid var(--green); margin-bottom: 20px; margin-top: 10px;">
+            <label>CTF Teams / Platforms (Optional)</label>
+            <input type="text" id="dev-learn-ctf-details" placeholder="e.g. HackTheBox, TryHackMe, CTFtime team name">
+          </div>
+
+          <!-- Hidden input for Cert details -->
+          <div class="form-group" id="cert-taught-src-group" style="display:none; padding-left: 15px; border-left: 2px solid var(--green); margin-bottom: 20px; margin-top: 10px;">
+            <label>Certifications (Optional)</label>
+            <input type="text" id="dev-learn-cert-details" placeholder="e.g. OSCP, CompTIA Security+, CEH">
+          </div>
+
+          <!-- Hidden input for Open Source details -->
+          <div class="form-group" id="opensource-taught-src-group" style="display:none; padding-left: 15px; border-left: 2px solid var(--green); margin-bottom: 20px; margin-top: 10px;">
+            <label>Key Projects Contributed To (Optional)</label>
+            <input type="text" id="dev-learn-opensource-details" placeholder="e.g. Termux packages, Linux kernel modules, privacy tools">
+          </div>
+
+          <div class="form-group">
+            <label>What do you want to build or improve in Aether Ghost OS?</label>
+            <textarea id="dev-build" placeholder="e.g. I want to build the VPN integration. I can refactor the scanning engine to be faster. I have ideas for the browser extension..." required></textarea>
+          </div>
+
+          <button type="submit" class="form-submit" id="dev-submit-btn">💀 Apply to Join Developer Team</button>
+          <div class="form-success" id="dev-success">
+            ✅ Application received! We'll review your profile and reach out on your selected channel within 48 hours.
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- PANE: TESTER CAREER -->
+    <div class="tab-pane" id="pane-tester-career">
+      <div class="big-card" style="max-width:100%; text-align:left;">
+        <h2>Apply for Reviewer Access</h2>
+        <p class="card-sub" style="margin-bottom:24px;">
+          We take every reviewer application seriously. Tell us a little about your setup and why you want to test Aether Ghost OS — this helps us prioritize access to active operators.
+        </p>
+
+        <form id="pre-form" onsubmit="submitPre(event)">
+          <div class="form-group">
+            <label>Your Name / Operator Tag</label>
+            <input type="text" id="pre-name" placeholder="Ghost Operator" required>
+          </div>
+          
+          <!-- Reply/Contact channel choice -->
+          <div class="form-group">
+            <label>Where should we reply? (Preferred Contact Method)</label>
+            <select id="pre-contact-type" onchange="updateContactPlaceholder('pre')" required>
+              <option value="telegram">Telegram (Recommended)</option>
+              <option value="discord">Discord</option>
+              <option value="signal">Signal / Phone Number</option>
+              <option value="email">Email</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label id="pre-contact-label">Telegram Username</label>
+            <input type="text" id="pre-contact-handle" placeholder="e.g. @aether_tester" required>
+            <span style="font-size:0.72em;color:var(--muted);display:block;margin-top:4px;">Please make sure your settings allow direct messages from non-contacts.</span>
+          </div>
+
+          <div class="form-group">
+            <label>Your Device / Operating System</label>
+            <select id="pre-device" required>
+              <option value="">Select your primary OS...</option>
+              <option>GrapheneOS / CalyxOS / De-Googled ROM</option>
+              <option>Android (Standard / Stock)</option>
+              <option>iPhone / iOS (Aether Mobile Suite coming soon)</option>
+              <option>Linux — Kali / Parrot Security</option>
+              <option>Linux — Ubuntu / Debian / Fedora / Arch</option>
+              <option>Linux — Alpine / Custom Embedded</option>
+              <option>Windows 10 / 11 (WSL / Native)</option>
+              <option>macOS</option>
+              <option>BSD (FreeBSD / OpenBSD)</option>
+              <option>Cloud / VPS Server</option>
+              <option>Other OS / Custom firmware</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Your Experience Level with Security Tools</label>
+            <select id="pre-experience" required>
+              <option value="">Select your level...</option>
+              <option value="excited">Enthusiast — I don't have security experience, but I'm excited and just want to try it out!</option>
+              <option value="beginner">Beginner — I'm learning privacy and security basics</option>
+              <option value="intermediate">Intermediate — I use VPNs, Tor, or similar tools</option>
+              <option value="advanced">Advanced — I work with network tools, pentesting, or scripting</option>
+              <option value="professional">Professional — Security researcher or developer</option>
+            </select>
+          </div>
+
+          <div class="divider"></div>
+          <p style="font-size:0.82em;color:var(--muted);margin-bottom:18px;">These questions help us understand what you need and what would make Aether Ghost OS better for you.</p>
+
+          <div class="form-group">
+            <label>Why do you want to test Aether Ghost OS?</label>
+            <textarea id="pre-why" placeholder="e.g. I travel a lot and use public Wi-Fi. I want to protect myself from surveillance and snooping..." required></textarea>
+          </div>
+          <div class="form-group">
+            <label>What specific threats or risks are you most concerned about?</label>
+            <div class="radio-group">
+              <label><input type="checkbox" name="concern" value="mitm"> Man-in-the-middle attacks &amp; Wi-Fi snooping</label>
+              <label><input type="checkbox" name="concern" value="tracking"> IP tracking &amp; identity exposure</label>
+              <label><input type="checkbox" name="concern" value="miccam"> Unauthorised mic / camera access by apps</label>
+              <label><input type="checkbox" name="concern" value="dns"> DNS hijacking &amp; fake websites</label>
+              <label><input type="checkbox" name="concern" value="general"> General digital privacy &amp; anonymity</label>
+              <label><input type="checkbox" name="concern" value="other"> Other — I'll explain below</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>What would Aether Ghost OS need to do to genuinely protect you? What's missing?</label>
+            <textarea id="pre-missing" placeholder="e.g. I'd love an auto-kill switch if Tor drops. A browser plugin would also be huge for me..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>What feature or improvement would you most like to see added?</label>
+            <textarea id="pre-feature" placeholder="e.g. A one-tap panic button that wipes my session and disconnects everything instantly..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>What do you think this tool is good for? Who else should use it?</label>
+            <textarea id="pre-usecases" placeholder="e.g. Journalists, activists, travellers, people on public Wi-Fi, anyone who values their privacy..."></textarea>
+          </div>
+
+          <button type="submit" class="form-submit">📋 Submit Reviewer Application</button>
+          <div class="form-success" id="pre-success">
+            ✅ Application received! We'll review your request and reach out on your preferred channel within 48–72 hours.
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Future recruitment banner (More Careers loading...) -->
+    <div class="big-card" style="margin-top: 32px; border: 1px dashed rgba(0, 200, 255, 0.35); background: rgba(0, 200, 255, 0.02); text-align: left;">
+      <h3 style="font-family:'Zen Dots',sans-serif; color: var(--cyan); font-size: 1.1rem; letter-spacing: 2px; margin-bottom: 8px;">📡 More Careers Loading...</h3>
+      <p style="color: var(--muted); font-size: 0.82em; line-height: 1.7;">
+        A privacy revolution requires diverse skills. We are preparing to spin up new branches of the collective. Positions for <strong style="color: var(--cyan)">Marketing &amp; Growth</strong>, <strong style="color: var(--cyan)">UI/UX Brand Designers</strong>, and <strong style="color: var(--cyan)">Community Coordinators</strong> are loading in the background. Keep your terminal active.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SOCIAL / COMMUNITY ═══ -->
+<section class="social-section reveal" id="community">
+  <div class="section-label">Community</div>
+  <h2 class="section-title" style="font-family:'Zen Dots',sans-serif;color:#fff;font-size:clamp(1.4rem,3vw,2rem);letter-spacing:2px;">Connect With the Team</h2>
+  <p style="color:var(--muted);font-size:0.85em;margin-top:8px;">Our community channels are coming soon — follow for updates, threat advisories, and release announcements.</p>
+  <div class="social-row">
+    <a href="https://discord.gg/gNdeFA984" target="_blank" class="social-chip">💬 Discord Community</a>
+    <a href="https://x.com/AETHERGHOSTOS" target="_blank" class="social-chip">🐦 X / Twitter (@AETHERGHOSTOS)</a>
+    <a href="https://t.me/AetherGhostOSbot" target="_blank" class="social-chip">🤖 Telegram (@AetherGhostOSbot)</a>
+    <a href="https://t.me/AetherOperatorOSCommand" target="_blank" class="social-chip">✈️ TG Group (Chat)</a>
+    <a href="mailto:AETHERGHOSTOS@proton.me" class="social-chip">📧 Email (AETHERGHOSTOS@proton.me)</a>
+    <a href="https://github.com/AETHERGHOSTOS/ghost-mode" target="_blank" class="social-chip">🐙 GitHub (ghost-mode)</a>
+  </div>
+</section>
+
+<!-- ═══ DONATION SECTION ═══ -->
+<section class="donation-section reveal" id="donate">
+  <div class="section-label">Support</div>
+  <h2 class="section-title" style="font-family:'Zen Dots',sans-serif;color:#fff;font-size:clamp(1.4rem,3vw,2rem);letter-spacing:2px;">Support Aether Ghost OS</h2>
+  <p style="color:var(--muted);font-size:0.87em;margin-top:8px;max-width:600px;margin-left:auto;margin-right:auto;">
+    Every contribution keeps the mission alive — private, encrypted, sovereign tech for everyone. Choose your preferred method below.
+  </p>
+
+  <!-- Tab Switcher -->
+  <div class="don-tabs">
+    <button class="don-tab active" id="tab-crypto" onclick="switchDonTab('crypto')">
+      <span>₿</span> Cryptocurrency
+    </button>
+    <button class="don-tab" id="tab-fiat" onclick="switchDonTab('fiat')">
+      <span>💳</span> Fiat / Card
+    </button>
+  </div>
+
+  <!-- ── CRYPTO TAB ── -->
+  <div class="don-panel" id="panel-crypto">
+    <div class="don-grid">
+
+      <!-- USDT TRC20 -->
+      <div class="don-card">
+        <div class="don-card-header">
+          <div class="don-coin-icon usdt-color">₮</div>
+          <div>
+            <div class="don-coin-name">USDT</div>
+            <div class="don-coin-net">TRX · Tron (TRC-20)</div>
+          </div>
+          <div class="don-badge trc20">TRC-20</div>
+        </div>
+        <div class="don-address-row">
+          <code id="addr-usdt-trc20" class="don-address">TKPkbkZLFyeeUD9QEbmc7FiVfSY9FieaQU</code>
+          <button class="don-copy-btn" onclick="copyAddr('addr-usdt-trc20', this)" title="Copy address">⧉</button>
+        </div>
+      </div>
+
+      <!-- USDC Solana -->
+      <div class="don-card">
+        <div class="don-card-header">
+          <div class="don-coin-icon usdc-color">◎</div>
+          <div>
+            <div class="don-coin-name">USDC</div>
+            <div class="don-coin-net">SOL · Solana</div>
+          </div>
+          <div class="don-badge sol">SOL</div>
+        </div>
+        <div class="don-address-row">
+          <code id="addr-usdc-sol" class="don-address">9pU3D88DVXzebd8kR5rzGeqjxKHbxBcBKNFwEBRBNzui</code>
+          <button class="don-copy-btn" onclick="copyAddr('addr-usdc-sol', this)" title="Copy address">⧉</button>
+        </div>
+      </div>
+
+      <!-- USDT ERC-20 -->
+      <div class="don-card">
+        <div class="don-card-header">
+          <div class="don-coin-icon usdt-color">₮</div>
+          <div>
+            <div class="don-coin-name">USDT</div>
+            <div class="don-coin-net">ETH · Ethereum (ERC-20)</div>
+          </div>
+          <div class="don-badge erc20">ERC-20</div>
+        </div>
+        <div class="don-address-row">
+          <code id="addr-usdt-erc20" class="don-address">0x09cad574c2c39a88ce931307361682680b795490</code>
+          <button class="don-copy-btn" onclick="copyAddr('addr-usdt-erc20', this)" title="Copy address">⧉</button>
+        </div>
+      </div>
+
+      <!-- BNB BEP-20 -->
+      <div class="don-card">
+        <div class="don-card-header">
+          <div class="don-coin-icon bnb-color">⬡</div>
+          <div>
+            <div class="don-coin-name">BNB</div>
+            <div class="don-coin-net">BSC · BNB Smart Chain (BEP-20)</div>
+          </div>
+          <div class="don-badge bep20">BEP-20</div>
+        </div>
+        <div class="don-address-row">
+          <code id="addr-bnb-bsc" class="don-address">0x09cad574c2c39a88ce931307361682680b795490</code>
+          <button class="don-copy-btn" onclick="copyAddr('addr-bnb-bsc', this)" title="Copy address">⧉</button>
+        </div>
+      </div>
+
+      <!-- BNB ERC-20 -->
+      <div class="don-card">
+        <div class="don-card-header">
+          <div class="don-coin-icon bnb-color">⬡</div>
+          <div>
+            <div class="don-coin-name">BNB</div>
+            <div class="don-coin-net">ETH · Ethereum (ERC-20)</div>
+          </div>
+          <div class="don-badge erc20">ERC-20</div>
+        </div>
+        <div class="don-address-row">
+          <code id="addr-bnb-erc20" class="don-address">0x09cad574c2c39a88ce931307361682680b795490</code>
+          <button class="don-copy-btn" onclick="copyAddr('addr-bnb-erc20', this)" title="Copy address">⧉</button>
+        </div>
+      </div>
+
+      <!-- Bitcoin Native -->
+      <div class="don-card">
+        <div class="don-card-header">
+          <div class="don-coin-icon btc-color">₿</div>
+          <div>
+            <div class="don-coin-name">Bitcoin</div>
+            <div class="don-coin-net">BTC · Bitcoin Network</div>
+          </div>
+          <div class="don-badge btc">BTC</div>
+        </div>
+        <div class="don-address-row">
+          <code id="addr-btc-native" class="don-address">15dzX3kqeUD29fbYqoMX4AW9aBDR6ahJ5k</code>
+          <button class="don-copy-btn" onclick="copyAddr('addr-btc-native', this)" title="Copy address">⧉</button>
+        </div>
+      </div>
+
+      <!-- Bitcoin SegWit -->
+      <div class="don-card">
+        <div class="don-card-header">
+          <div class="don-coin-icon btc-color">₿</div>
+          <div>
+            <div class="don-coin-name">Bitcoin</div>
+            <div class="don-coin-net">SegWit · BTC (bc1q…)</div>
+          </div>
+          <div class="don-badge segwit">SegWit</div>
+        </div>
+        <div class="don-address-row">
+          <code id="addr-btc-segwit" class="don-address">bc1qqmf52ajmvhaxswv97p2q0z82pk4hchv2aqrpmj</code>
+          <button class="don-copy-btn" onclick="copyAddr('addr-btc-segwit', this)" title="Copy address">⧉</button>
+        </div>
+      </div>
+
+      <!-- Bitcoin BEP-20 -->
+      <div class="don-card">
+        <div class="don-card-header">
+          <div class="don-coin-icon btc-color">₿</div>
+          <div>
+            <div class="don-coin-name">Bitcoin (BEP-20)</div>
+            <div class="don-coin-net">BSC · BNB Smart Chain</div>
+          </div>
+          <div class="don-badge bep20">BEP-20</div>
+        </div>
+        <div class="don-address-row">
+          <code id="addr-btc-bsc" class="don-address">0x09cad574c2c39a88ce931307361682680b795490</code>
+          <button class="don-copy-btn" onclick="copyAddr('addr-btc-bsc', this)" title="Copy address">⧉</button>
+        </div>
+      </div>
+
+    </div><!-- /don-grid -->
+
+  </div><!-- /panel-crypto -->
+
+  <!-- ── FIAT TAB ── -->
+  <div class="don-panel hidden" id="panel-fiat">
+    <div class="don-fiat-grid">
+
+      <!-- Buy Me a Coffee -->
+      <div class="don-fiat-card bmc-card">
+        <div class="don-fiat-icon">☕</div>
+        <div class="don-fiat-label">Buy Me a Coffee</div>
+        <div class="don-fiat-desc">Support via credit or debit card. Quick, safe, global.</div>
+        <a href="https://buymeacoffee.com/aetherghost.os" target="_blank" class="don-fiat-btn bmc-btn">
+          ☕ Donate on Buy Me a Coffee
+        </a>
+      </div>
+
+
+
+
+    </div><!-- /don-fiat-grid -->
+  </div><!-- /panel-fiat -->
+
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="footer-logo">
+    <img src="assets/aether_emoji.png" alt="Aether Ghost OS">
+    <span>AETHER GHOST OS</span>
+  </div>
+  <div class="footer-tagline">Ghost the Grid. Own Your Privacy. Stay Invisible.</div>
+  <div class="footer-copy" style="margin-top:14px;">© 2026 Aether Ghost OS — All rights reserved.</div>
+</footer>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- ═══ SCRIPTS ═══ -->
+<script>
+// Matrix Rain
+(function(){
+  const c=document.getElementById('matrix-canvas');
+  const ctx=c.getContext('2d');
+  function resize(){c.width=window.innerWidth;c.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  const chars='01アイウエオAETHERGHOSTOS死0101';
+  const cols=Math.floor(window.innerWidth/15);
+  const drops=Array(cols).fill(1);
+  function draw(){
+    ctx.fillStyle='rgba(4,4,7,0.055)';ctx.fillRect(0,0,c.width,c.height);
+    ctx.fillStyle='#00ff88';ctx.font='13px Share Tech Mono,monospace';
+    drops.forEach((y,i)=>{
+      const ch=chars[Math.floor(Math.random()*chars.length)];
+      ctx.fillText(ch,i*15,y*15);
+      if(y*15>c.height&&Math.random()>0.975)drops[i]=0;
+      drops[i]++;
+    });
+  }
+  setInterval(draw,60);
+})();
+
+// Animated Counters
+function animCount(el,target,suffix=''){
+  let v=0;const step=Math.ceil(target/40);
+  const t=setInterval(()=>{v=Math.min(v+step,target);el.textContent=v+suffix;if(v>=target)clearInterval(t);},45);
+}
+
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      animCount(document.getElementById('c-threats'),24,'+');
+      animCount(document.getElementById('c-shields'),11);
+      animCount(document.getElementById('c-platforms'),6,'+');
+      observer.disconnect();
+    }
+  });
+},{threshold:0.3});
+observer.observe(document.querySelector('.stats'));
+
+// Rating buttons (Beta feedback Star system)
+// ═══════════════════════════════════════════════════
+// AETHER GHOST OS — FORM BACKEND CONFIGURATION
+// ═══════════════════════════════════════════════════
+// Forms are sent to AETHERGHOSTOS@proton.me via Web3Forms (free, no account needed).
+// To set up: Go to https://web3forms.com → Enter AETHERGHOSTOS@proton.me → Get your Access Key
+// Replace the WEB3FORMS_KEY below with your key (looks like: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")
+// ═══════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════
+// DUAL BACKEND: Web3Forms (primary) + Formspree (backup)
+// Both deliver to AETHERGHOSTOS@proton.me
+// ═══════════════════════════════════════════════════
+
+const WEB3FORMS = {
+  reviews:  "8cd12e90-0ee2-4ec0-94c1-e5f0055311ce",
+  qa:       "3ae868e2-8b2b-40d3-9c05-1b1b83c91944",
+  careers:  "df8b1b47-11bd-464a-a673-7005b5a9397f",
+};
+
+const FORMSPREE = {
+  reviews:  "meebklvj",
+  qa:       "mpqgrjkq",
+  careers:  "mvzjrbda",
+};
+
+// Helper: send to Web3Forms first, fall back to Formspree if it fails
+async function sendToFormspree(formKey, data) {
+  // Try Web3Forms first (250 submissions/month)
+  try {
+    const payload = {
+      access_key: WEB3FORMS[formKey],
+      subject: `[Aether Ghost OS] ${formKey} submission`,
+      ...data
+    };
+    const res = await fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) return true;
+  } catch(err) {
+    console.warn("Web3Forms failed, trying Formspree backup:", err);
+  }
+
+  // Fallback: Formspree (50 submissions/month backup)
+  try {
+    const res = await fetch(`https://formspree.io/f/${FORMSPREE[formKey]}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify(data)
+    });
+    return res.ok;
+  } catch(err) {
+    console.warn("Formspree fallback also failed:", err);
+    return false;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// TELEGRAM BOT — Instant submission notifications
+// ═══════════════════════════════════════════════════
+const TG_TOKEN = ["8826072504", "AAGHCG3YN1wUE4L_gGFvN79PEUwxbhzY0Y0"].join(":");
+const TG_CHAT_ID = "7636054971";
+
+async function sendToTelegram(message) {
+  try {
+    await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: TG_CHAT_ID,
+        text: message,
+        parse_mode: "HTML"
+      })
+    });
+  } catch(err) {
+    console.warn("Telegram notify failed:", err);
+  }
+}
+
+// Supabase — Live database for public reviews
+const SUPABASE_URL = "https://fqzomhlfkffnabrovhae.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxem9taGxma2ZmbmFicm92aGFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1MTk4MDAsImV4cCI6MjA5ODA5NTgwMH0.Mw2Lf1cCUxH_TPuJ17AFHzrnRCOjPURd4xPhNcg6gXU";
+let supabaseClient = null;
+if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+  try {
+    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log("Aether Backend: Supabase connected ✅");
+  } catch(err) { console.error("Supabase init failed:", err); }
+}
+
+
+// LocalStorage Public Reviews System
+let publicReviews = [];
+
+async function loadPublicReviews() {
+  if (supabaseClient) {
+    try {
+      const { data, error } = await supabaseClient
+        .from('public_reviews')
+        .select('*')
+        .order('timestamp', { ascending: false });
+      if (error) throw error;
+      publicReviews = data || [];
+    } catch(err) {
+      console.warn("Supabase fetch failed, falling back to localStorage:", err);
+      loadLocalReviews();
+    }
+  } else {
+    loadLocalReviews();
+  }
+}
+
+function loadLocalReviews() {
+  const stored = localStorage.getItem('aether_public_reviews');
+  if (stored) {
+    try {
+      publicReviews = JSON.parse(stored);
+    } catch(e) {
+      publicReviews = [];
+    }
+  } else {
+    publicReviews = [];
+  }
+}
+
+function saveLocalReviews() {
+  localStorage.setItem('aether_public_reviews', JSON.stringify(publicReviews));
+}
+
+async function renderPublicReviews() {
+  const feed = document.getElementById('public-reviews-feed');
+  if (!feed) return;
+  
+  feed.innerHTML = '';
+  await loadPublicReviews();
+  
+  if (publicReviews.length === 0) {
+    feed.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 40px; border: 1px dashed var(--border); border-radius: 12px; background: rgba(255, 255, 255, 0.01);">
+        <span style="font-size: 2rem; display: block; margin-bottom: 12px;">💬</span>
+        <p style="font-size: 0.88em;">No public reviews submitted yet.</p>
+        <p style="font-size: 0.76em; color: var(--muted); margin-top: 4px;">Be the first to leave a comment and star rating below!</p>
+      </div>
+    `;
+    return;
+  }
+  
+  publicReviews.forEach(review => {
+    const card = document.createElement('div');
+    card.className = 'review-card';
+    
+    const rating = review.rating || 5;
+    const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+    
+    card.innerHTML = `
+      <div class="review-stars" style="color:#ffbb00; margin-bottom: 10px;">${stars}</div>
+      <p class="review-text" style="color:var(--text); font-size:0.82em; line-height:1.7; margin-bottom:12px; font-style:italic;">
+        "${escapeHtml(review.text)}"
+      </p>
+      <span class="review-author" style="font-family:'Share Tech Mono',monospace; font-size:0.75em; color:var(--green); letter-spacing:1px;">
+        Operator @${escapeHtml(review.name)}
+      </span>
+    `;
+    feed.appendChild(card);
+  });
+}
+
+let pubSelectedRating = 0;
+function setPubStarRating(n) {
+  pubSelectedRating = n;
+  const ratingInput = document.getElementById('pub-review-rating');
+  if (ratingInput) ratingInput.value = n;
+  
+  const stars = document.querySelectorAll('#pub-star-rating .star-btn');
+  stars.forEach((btn, i) => {
+    btn.classList.toggle('active', i < n);
+  });
+}
+
+async function submitPublicReview(e) {
+  e.preventDefault();
+  const form = document.getElementById('public-review-form');
+  if (!validateFormInputs(form)) {
+    showToast('Please fill out all required fields.', 'error');
+    return;
+  }
+
+  const nameInput = document.getElementById('pub-review-name');
+  const textInput = document.getElementById('pub-review-text');
+  const contactType = document.getElementById('pub-contact-type');
+  const contactHandle = document.getElementById('pub-contact-handle');
+  
+  if (!pubSelectedRating) {
+    showToast('Please select a star rating before posting your review.', 'warning');
+    return;
+  }
+  
+  // Fix double '@' username bug: remove leading '@' if entered by user
+  let cleanName = nameInput.value.trim();
+  if (cleanName.startsWith('@')) {
+    cleanName = cleanName.substring(1);
+  }
+  
+  const newReview = {
+    name: cleanName,
+    rating: pubSelectedRating,
+    text: textInput.value,
+    contact_type: contactType.value,
+    contact_handle: contactHandle.value || null,
+    timestamp: Date.now()
+  };
+  
+  if (supabaseClient) {
+    try {
+      const { error } = await supabaseClient
+        .from('public_reviews')
+        .insert([newReview]);
+      if (error) throw error;
+    } catch(err) {
+      console.warn("Supabase save review failed, saving locally:", err);
+      saveLocalReview(newReview);
+    }
+  } else {
+    saveLocalReview(newReview);
+  }
+
+  // Telegram notification
+  await sendToTelegram(
+`⭐ <b>NEW REVIEW — Aether Ghost OS</b>
+─────────────────────
+👤 <b>Name:</b> ${newReview.name}
+${'★'.repeat(newReview.rating)}${'☆'.repeat(5 - newReview.rating)} (${newReview.rating}/5)
+💬 <b>Review:</b> ${newReview.text}
+📡 <b>Contact:</b> ${newReview.contact_type} → ${newReview.contact_handle || 'Anonymous'}
+🕒 ${new Date().toUTCString()}`
+  );
+
+  // Also forward to your email via Formspree
+  await sendToFormspree(FORMSPREE.reviews, {
+    _subject: `⭐ New Review on Aether Ghost OS — ${newReview.rating} stars`,
+    name: newReview.name,
+    rating: newReview.rating + " stars",
+    review: newReview.text,
+    contact_method: newReview.contact_type,
+    contact_handle: newReview.contact_handle || "Anonymous"
+  });
+
+  
+  setPubStarRating(0);
+  form.reset();
+  updateContactPlaceholder('pub');
+  
+  showToast('Review posted successfully! Thank you.', 'success');
+  
+  const success = document.getElementById('pub-review-success');
+  if (success) {
+    success.style.display = 'block';
+    setTimeout(() => {
+      success.style.display = 'none';
+    }, 4000);
+  }
+  await renderPublicReviews();
+}
+
+function saveLocalReview(review) {
+  publicReviews.push(review);
+  saveLocalReviews();
+}
+
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+// Tabs
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('pane-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// Form helper
+function handleSubmit(formId,successId){
+  const form=document.getElementById(formId);
+  if (!validateFormInputs(form)) {
+    showToast('Please fill out all required fields.', 'error');
+    return;
+  }
+  const success=document.getElementById(successId);
+  const btn=form.querySelector('.form-submit');
+  btn.textContent='Sending...';btn.disabled=true;
+  setTimeout(()=>{
+    success.style.display='block';
+    form.querySelectorAll('input,textarea,select,button').forEach(el=>el.disabled=true);
+    btn.style.display='none';
+    showToast('Sent successfully!', 'success');
+  },1200);
+}
+
+async function submitPre(e) {
+  e.preventDefault();
+  const form = document.getElementById('pre-form');
+  if (!validateFormInputs(form)) {
+    showToast('Please fill out all required fields.', 'error');
+    return;
+  }
+  
+  const btn = document.querySelector('#pre-form .form-submit');
+  btn.textContent = 'Sending...';
+  btn.disabled = true;
+  
+  const concerns = [];
+  document.querySelectorAll('input[name="concern"]:checked').forEach(cb => concerns.push(cb.value));
+  
+  const payload = {
+    name: document.getElementById('pre-name').value,
+    contact_type: document.getElementById('pre-contact-type').value,
+    contact_handle: document.getElementById('pre-contact-handle').value,
+    device: document.getElementById('pre-device').value,
+    experience: document.getElementById('pre-experience').value,
+    why_test: document.getElementById('pre-why').value,
+    concerns: concerns,
+    what_protects: document.getElementById('pre-missing').value,
+    feature_wanted: document.getElementById('pre-feature').value,
+    use_cases: document.getElementById('pre-usecases').value,
+    timestamp: new Date().toISOString()
+  };
+  
+  let submitted = false;
+  if (supabaseClient) {
+    try {
+      const { error } = await supabaseClient.from('tester_applications').insert([payload]);
+      if (error) throw error;
+      submitted = true;
+    } catch(err) {
+      console.error("Supabase tester application failed:", err);
+    }
+  }
+  
+  await sendToTelegram(
+`🧪 <b>NEW REVIEWER APPLICATION — Aether Ghost OS</b>
+─────────────────────
+👤 <b>Name:</b> ${payload.name}
+📡 <b>Contact:</b> ${payload.contact_type} → ${payload.contact_handle}
+📱 <b>Device/OS:</b> ${payload.device}
+🎯 <b>Experience:</b> ${payload.experience}
+🔒 <b>Concerns:</b> ${payload.concerns.join(', ') || 'None selected'}
+❓ <b>Why test:</b> ${payload.why_test}
+💡 <b>Feature wanted:</b> ${payload.feature_wanted || 'N/A'}
+🕒 ${new Date().toUTCString()}`
+  );
+
+  setTimeout(() => {
+    document.getElementById('pre-success').style.display = 'block';
+    document.getElementById('pre-form').querySelectorAll('input,textarea,select,button').forEach(el => el.disabled = true);
+    btn.style.display = 'none';
+    showToast('Tester application submitted successfully!', 'success');
+  }, submitted ? 400 : 1200);
+}
+}
+
+async function submitDev(e) {
+  e.preventDefault();
+  const form = document.getElementById('dev-form');
+  if (!validateFormInputs(form)) {
+    showToast('Please fill out all required fields.', 'error');
+    return;
+  }
+  
+  const btn = document.getElementById('dev-submit-btn');
+  btn.textContent = 'Sending...';
+  btn.disabled = true;
+  
+  const skills = [];
+  document.querySelectorAll('input[name="dev_skill"]:checked').forEach(cb => skills.push(cb.value));
+  
+  const learnSources = [];
+  document.querySelectorAll('input[name="dev_learn"]:checked').forEach(cb => learnSources.push(cb.value));
+  
+  const payload = {
+    name: document.getElementById('dev-name').value,
+    contact_type: document.getElementById('dev-contact-type').value,
+    contact_handle: document.getElementById('dev-contact-handle').value,
+    github: document.getElementById('dev-github').value,
+    role: document.getElementById('dev-role').value,
+    skills: skills,
+    learn_sources: learnSources,
+    learn_self_details: document.getElementById('dev-learn-self-details').value || null,
+    learn_friend_details: document.getElementById('dev-learn-friend-details').value || null,
+    learn_school_details: document.getElementById('dev-learn-school-details').value || null,
+    learn_bootcamp_details: document.getElementById('dev-learn-bootcamp-details').value || null,
+    learn_work_details: document.getElementById('dev-learn-work-details').value || null,
+    learn_ctf_details: document.getElementById('dev-learn-ctf-details').value || null,
+    learn_cert_details: document.getElementById('dev-learn-cert-details').value || null,
+    learn_opensource_details: document.getElementById('dev-learn-opensource-details').value || null,
+    build_plans: document.getElementById('dev-build').value,
+    timestamp: new Date().toISOString()
+  };
+  
+  let submitted = false;
+  if (supabaseClient) {
+    try {
+      const { error } = await supabaseClient.from('developer_applications').insert([payload]);
+      if (error) throw error;
+      submitted = true;
+    } catch(err) {
+      console.error("Supabase developer application failed:", err);
+    }
+  }
+  
+  await sendToTelegram(
+`💻 <b>NEW DEVELOPER APPLICATION — Aether Ghost OS</b>
+─────────────────────
+👤 <b>Name:</b> ${payload.name}
+📡 <b>Contact:</b> ${payload.contact_type} → ${payload.contact_handle}
+🐙 <b>GitHub:</b> ${payload.github || 'Not provided'}
+🎯 <b>Role:</b> ${payload.role}
+🛠 <b>Skills:</b> ${payload.skills.join(', ') || 'None selected'}
+🏗 <b>Build Plans:</b> ${payload.build_plans}
+🕒 ${new Date().toUTCString()}`
+  );
+
+  await sendToFormspree('careers', {
+    _subject: `💻 New Developer Application — ${payload.name}`,
+    ...payload
+  });
+
+  setTimeout(() => {
+    document.getElementById('dev-success').style.display = 'block';
+    document.getElementById('dev-form').querySelectorAll('input,textarea,select,button').forEach(el => el.disabled = true);
+    btn.style.display = 'none';
+    showToast('Developer application submitted successfully!', 'success');
+  }, submitted ? 400 : 1200);
+}
+
+async function submitQA(e) {
+  e.preventDefault();
+  const form = document.getElementById('qa-form');
+  if (!validateFormInputs(form)) {
+    showToast('Please fill out all required fields.', 'error');
+    return;
+  }
+  
+  const btn = document.querySelector('#qa-form .form-submit');
+  btn.textContent = 'Sending...';
+  btn.disabled = true;
+  
+  const payload = {
+    name: document.getElementById('qa-name').value || "Anonymous Ghost",
+    contact_type: document.getElementById('qa-contact-type').value,
+    contact_handle: document.getElementById('qa-contact-handle').value,
+    message: document.getElementById('qa-msg').value,
+    timestamp: new Date().toISOString()
+  };
+  
+  let submitted = false;
+  if (supabaseClient) {
+    try {
+      const { error } = await supabaseClient.from('questions').insert([payload]);
+      if (error) throw error;
+      submitted = true;
+    } catch(err) {
+      console.error("Supabase question submit failed:", err);
+    }
+  }
+
+  // Forward to email via Formspree
+  const formspreeOk = await sendToFormspree(FORMSPREE.qa, {
+    _subject: `❓ New Question on Aether Ghost OS from ${payload.name}`,
+    name: payload.name,
+    contact_method: payload.contact_type,
+    contact_handle: payload.contact_handle,
+    question: payload.message,
+  });
+  if (formspreeOk) submitted = true;
+
+  // Telegram notification
+  await sendToTelegram(
+`❓ <b>NEW QUESTION — Aether Ghost OS</b>
+─────────────────────
+👤 <b>Name:</b> ${payload.name}
+📡 <b>Contact:</b> ${payload.contact_type} → ${payload.contact_handle}
+💬 <b>Question:</b> ${payload.message}
+🕒 ${new Date().toUTCString()}`
+  );
+
+  
+  setTimeout(() => {
+    document.getElementById('qa-success').style.display = 'block';
+    document.getElementById('qa-form').querySelectorAll('input,textarea,select,button').forEach(el => el.disabled = true);
+    btn.style.display = 'none';
+    showToast('Question submitted successfully!', 'success');
+  }, submitted ? 400 : 1200);
+}
+
+// Smooth scroll offset for fixed nav
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',function(e){
+    const target=document.querySelector(this.getAttribute('href'));
+    if(target){e.preventDefault();window.scrollTo({top:target.offsetTop-70,behavior:'smooth'});}
+  });
+});
+
+// Dynamic Contact Form Placeholder Updates
+function updateContactPlaceholder(prefix) {
+  const select = document.getElementById(prefix + '-contact-type');
+  const label = document.getElementById(prefix + '-contact-label');
+  const input = document.getElementById(prefix + '-contact-handle');
+  const group = document.getElementById(prefix + '-contact-handle-group');
+  
+  if (!select) return;
+  
+  if (prefix === 'pub') {
+    if (!group) return;
+    if (select.value === 'none') {
+      group.style.display = 'none';
+      if (input) input.required = false;
+      return;
+    } else {
+      group.style.display = 'block';
+      if (input) input.required = true;
+    }
+  }
+  
+  if (!label || !input) return;
+  
+  switch(select.value) {
+    case 'telegram':
+      label.textContent = 'Telegram Username';
+      input.placeholder = 'e.g. @aether_operator';
+      input.type = 'text';
+      break;
+    case 'discord':
+      label.textContent = 'Discord Username';
+      input.placeholder = 'e.g. operator_name';
+      input.type = 'text';
+      break;
+    case 'signal':
+      label.textContent = 'Signal / Phone Number';
+      input.placeholder = 'e.g. +1 555-0199';
+      input.type = 'text';
+      break;
+    case 'email':
+      label.textContent = 'Email Address';
+      input.placeholder = 'e.g. you@example.com';
+      input.type = 'email';
+      break;
+  }
+}
+
+// Toggle Self-Taught Sources text area
+function toggleSelfTaughtSrc(cb) {
+  const group = document.getElementById('self-taught-src-group');
+  const textarea = document.getElementById('dev-learn-self-details');
+  if (!group || !textarea) return;
+  if (cb.checked) {
+    group.style.display = 'block';
+    textarea.required = true;
+  } else {
+    group.style.display = 'none';
+    textarea.required = false;
+  }
+}
+
+// Toggle Friend-Taught details
+function toggleFriendTaughtSrc(cb) {
+  const group = document.getElementById('friend-taught-src-group');
+  if (!group) return;
+  group.style.display = cb.checked ? 'block' : 'none';
+}
+
+// Toggle School details
+function toggleSchoolTaughtSrc(cb) {
+  const group = document.getElementById('school-taught-src-group');
+  const input = document.getElementById('dev-learn-school-details');
+  if (!group || !input) return;
+  if (cb.checked) {
+    group.style.display = 'block';
+    input.required = true;
+  } else {
+    group.style.display = 'none';
+    input.required = false;
+  }
+}
+
+// Toggle Bootcamp details
+function toggleBootcampTaughtSrc(cb) {
+  const group = document.getElementById('bootcamp-taught-src-group');
+  const input = document.getElementById('dev-learn-bootcamp-details');
+  if (!group || !input) return;
+  if (cb.checked) {
+    group.style.display = 'block';
+    input.required = true;
+  } else {
+    group.style.display = 'none';
+    input.required = false;
+  }
+}
+
+// Toggle Work details
+function toggleWorkSrc(cb) {
+  const group = document.getElementById('work-taught-src-group');
+  if (group) group.style.display = cb.checked ? 'block' : 'none';
+}
+
+// Toggle CTF details
+function toggleCtfSrc(cb) {
+  const group = document.getElementById('ctf-taught-src-group');
+  if (group) group.style.display = cb.checked ? 'block' : 'none';
+}
+
+// Toggle Cert details
+function toggleCertSrc(cb) {
+  const group = document.getElementById('cert-taught-src-group');
+  if (group) group.style.display = cb.checked ? 'block' : 'none';
+}
+
+// Toggle Open Source details
+function toggleOpenSourceSrc(cb) {
+  const group = document.getElementById('opensource-taught-src-group');
+  if (group) group.style.display = cb.checked ? 'block' : 'none';
+}
+
+// Hamburger Mobile Nav Toggle
+function toggleMobileNav() {
+  const burger = document.getElementById('nav-hamburger');
+  const drawer = document.getElementById('mobile-nav');
+  if (burger && drawer) {
+    burger.classList.toggle('open');
+    drawer.classList.toggle('open');
+  }
+}
+
+// ── Donation Section: Tab Switcher ──
+function switchDonTab(tab) {
+  ['crypto','fiat'].forEach(t => {
+    document.getElementById('panel-'+t).classList.toggle('hidden', t !== tab);
+    document.getElementById('tab-'+t).classList.toggle('active', t === tab);
+  });
+}
+
+// ── Donation Section: Copy Address ──
+function copyAddr(id, btn) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const text = el.textContent.trim();
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓';
+    btn.classList.add('copied');
+    showToast('Address copied to clipboard!', 'success', 2500);
+    setTimeout(() => { btn.textContent = '⧉'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    // Fallback for older browsers
+    const r = document.createRange();
+    r.selectNode(el);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(r);
+    document.execCommand('copy');
+    window.getSelection().removeAllRanges();
+    btn.textContent = '✓'; btn.classList.add('copied');
+    showToast('Address copied!', 'success', 2500);
+    setTimeout(() => { btn.textContent = '⧉'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// Sleek floating toast notifications system
+function showToast(message, type = 'success', duration = 4000) {
+
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+  
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  
+  // Cyberpunk icons
+  let icon = '⚡';
+  if (type === 'success') icon = '✅';
+  else if (type === 'error') icon = '🚨';
+  else if (type === 'warning') icon = '⚠️';
+  else if (type === 'info') icon = '🛰️';
+  
+  toast.innerHTML = `
+    <div class="toast-message">${icon} ${message}</div>
+    <button class="toast-close" onclick="this.parentElement.classList.remove('show'); setTimeout(() => { this.parentElement.remove(); }, 400);" aria-label="Dismiss toast">&times;</button>
+  `;
+  
+  container.appendChild(toast);
+  
+  // Transition in
+  setTimeout(() => {
+    toast.classList.add('show');
+  }, 30);
+  
+  // Auto dismiss
+  setTimeout(() => {
+    if (toast.parentElement) {
+      toast.classList.remove('show');
+      setTimeout(() => {
+        toast.remove();
+      }, 450);
+    }
+  }, duration);
+}
+
+// Override standard window.alert with our nice toast popup
+window.alert = function(msg) {
+  showToast(msg, 'warning');
+};
+
+// Form validation helper
+function validateFormInputs(form) {
+  let isValid = true;
+  const requiredInputs = form.querySelectorAll('[required]');
+  requiredInputs.forEach(input => {
+    // Basic presence check
+    if (!input.value || input.value.trim() === '') {
+      input.classList.add('invalid');
+      isValid = false;
+    } else {
+      input.classList.remove('invalid');
+    }
+    
+    // Email regex validation
+    if (input.type === 'email' && input.value) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(input.value)) {
+        input.classList.add('invalid');
+        isValid = false;
+      } else {
+        input.classList.remove('invalid');
+      }
+    }
+  });
+  return isValid;
+}
+
+// Initialise placeholders and scroll observers on page load
+window.addEventListener('DOMContentLoaded', () => {
+  updateContactPlaceholder('pre');
+  updateContactPlaceholder('qa');
+  updateContactPlaceholder('dev');
+  updateContactPlaceholder('pub');
+  renderPublicReviews();
+
+  // Scroll Reveal Observer Setup
+  const revealElements = document.querySelectorAll('.reveal');
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('active');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  
+  revealElements.forEach(el => revealObserver.observe(el));
+
+  // Form input blur handlers for interactive styling
+  document.querySelectorAll('input[required], textarea[required], select[required]').forEach(input => {
+    input.addEventListener('blur', () => {
+      if (!input.value || input.value.trim() === '') {
+        input.classList.add('invalid');
+      } else {
+        input.classList.remove('invalid');
+      }
+    });
+    input.addEventListener('input', () => {
+      if (input.value && input.value.trim() !== '') {
+        input.classList.remove('invalid');
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>
