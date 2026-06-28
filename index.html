@@ -1124,7 +1124,7 @@ nav { top: 40px !important; }
 
   <h1>Ghost the <span class="g">Grid.</span><br>Own Your <span class="c">Privacy.</span></h1>
   <p class="hero-sub">
-    A sovereign, unified privacy ecosystem protecting your data and network activity across mobile, desktop, and secure hardware configurations. Multi-layered defense. Real-time threat intelligence. Zero subscriptions.
+    I built this because I got tired of being watched. Aether Ghost OS is a privacy toolkit I put together in Termux — no root, no bloat, just real protection. It monitors your network, routes through Tor, and locks down your camera and mic. Built for people who actually care about their digital footprint.
     <br><span style="color:var(--cyan);font-size:0.85em;display:inline-block;margin-top:8px;letter-spacing:1px;">⚡ PC Workstation &amp; Custom Firmware Beta active · iOS Client Coming Soon</span>
   </p>
 
@@ -1214,7 +1214,7 @@ nav { top: 40px !important; }
     <div class="feature-card">
       <div class="feature-icon">📱</div>
       <h3>Sovereign Privacy Ecosystem</h3>
-      <p>We are building a complete privacy ecosystem under one roof, including a custom mobile app, a full-device VPN system, and a private browser.</p>
+      <p>The plan is to eventually bring everything under one roof — a proper mobile app, full-device VPN, and a hardened browser. Still building, but the core is already working.</p>
       <span class="feature-tag tag-soon">🔵 COMING SOON</span>
     </div>
   </div>
@@ -1442,7 +1442,7 @@ nav { top: 40px !important; }
 <section class="devteam-section reveal" id="careers">
   <div class="section-label">Ghost Careers</div>
   <h2 class="section-title">Join the Collective</h2>
-  <p class="section-sub" style="margin-bottom:40px;">We are building the future of decentralized digital sovereignty. Choose your track to apply. More roles are loading...</p>
+  <p class="section-sub" style="margin-bottom:40px;">Looking for people who actually get it — privacy, security, and building things that matter. Pick your role and tell me what you can bring to the table.</p>
   
   <!-- Detailed Vision/Roadmap card -->
   <div class="big-card" style="max-width: 840px; text-align: left; margin: 0 auto 40px; border: 1px solid var(--border2); background: rgba(10, 10, 22, 0.65);">
@@ -1739,7 +1739,7 @@ nav { top: 40px !important; }
   <div class="section-label">Support</div>
   <h2 class="section-title" style="font-family:'Zen Dots',sans-serif;color:#fff;font-size:clamp(1.4rem,3vw,2rem);letter-spacing:2px;">Support Aether Ghost OS</h2>
   <p style="color:var(--muted);font-size:0.87em;margin-top:8px;max-width:600px;margin-left:auto;margin-right:auto;">
-    Every contribution keeps the mission alive — private, encrypted, sovereign tech for everyone. Choose your preferred method below.
+    Every bit helps keep this going — hosting, tools, and time all cost something. If Aether Ghost OS has been useful to you, consider throwing something in. Choose whatever works for you.
   </p>
 
   <!-- Tab Switcher -->
@@ -2326,9 +2326,13 @@ async function submitPre(e) {
 
   setTimeout(() => {
     document.getElementById('pre-success').style.display = 'block';
-    document.getElementById('pre-form').querySelectorAll('input,textarea,select,button').forEach(el => el.disabled = true);
-    btn.style.display = 'none';
     showToast('Tester application submitted successfully!', 'success');
+    setTimeout(() => {
+      document.getElementById('pre-success').style.display = 'none';
+      form.reset();
+      btn.textContent = 'Submit Application';
+      btn.disabled = false;
+    }, 4000);
   }, submitted ? 400 : 1200);
 }
 
@@ -2400,9 +2404,13 @@ async function submitDev(e) {
 
   setTimeout(() => {
     document.getElementById('dev-success').style.display = 'block';
-    document.getElementById('dev-form').querySelectorAll('input,textarea,select,button').forEach(el => el.disabled = true);
-    btn.style.display = 'none';
     showToast('Developer application submitted successfully!', 'success');
+    setTimeout(() => {
+      document.getElementById('dev-success').style.display = 'none';
+      form.reset();
+      btn.textContent = 'Submit Application';
+      btn.disabled = false;
+    }, 4000);
   }, submitted ? 400 : 1200);
 }
 
@@ -2460,8 +2468,14 @@ async function submitQA(e) {
   
   setTimeout(() => {
     document.getElementById('qa-success').style.display = 'block';
-    document.getElementById('qa-form').querySelectorAll('input,textarea,select,button').forEach(el => el.disabled = true);
-    btn.style.display = 'none';
+    showToast('Question submitted! We\'ll reply on your chosen channel.', 'success');
+    setTimeout(() => {
+      document.getElementById('qa-success').style.display = 'none';
+      form.reset();
+      btn.textContent = 'Send Question';
+      btn.disabled = false;
+      updateContactPlaceholder('qa');
+    }, 4000);
     showToast('Question submitted successfully!', 'success');
   }, submitted ? 400 : 1200);
 }
