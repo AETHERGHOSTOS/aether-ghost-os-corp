@@ -2265,9 +2265,13 @@ function handleSubmit(formId,successId){
   btn.textContent='Sending...';btn.disabled=true;
   setTimeout(()=>{
     success.style.display='block';
-    form.querySelectorAll('input,textarea,select,button').forEach(el=>el.disabled=true);
-    btn.style.display='none';
     showToast('Sent successfully!', 'success');
+    setTimeout(()=>{
+      success.style.display='none';
+      form.reset();
+      btn.textContent='Submit';
+      btn.disabled=false;
+    }, 4000);
   },1200);
 }
 
