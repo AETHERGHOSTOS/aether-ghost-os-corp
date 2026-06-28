@@ -113,6 +113,11 @@ body::before{
   opacity: 1;
   transform: translateY(0);
 }
+/* Hero is always visible — never hidden */
+.hero {
+  opacity: 1 !important;
+  transform: none !important;
+}
 
 /* ── NAV ── */
 nav{
@@ -2719,9 +2724,16 @@ window.addEventListener('DOMContentLoaded', () => {
         revealObserver.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.12 });
+  }, { threshold: 0.05 });
   
-  revealElements.forEach(el => revealObserver.observe(el));
+  revealElements.forEach(el => {
+    revealObserver.observe(el);
+  });
+
+  // Fallback: show all reveal elements after 1.5s in case observer fails
+  setTimeout(() => {
+    document.querySelectorAll('.reveal').forEach(el => el.classList.add('active'));
+  }, 1500);
 
   // Form input blur handlers for interactive styling
   document.querySelectorAll('input[required], textarea[required], select[required]').forEach(input => {
