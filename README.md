@@ -37,34 +37,6 @@ Aether Ghost OS is a multi-layered mobile security and anonymity suite built ins
 
 ---
 
----
-
-## ☕ Support & Donate
-
-Aether Ghost OS is built and maintained independently. If this tool keeps you safe, consider supporting its development:
-
-### 🌐 Web Donations
-| Platform | Link |
-|---|---|
-| ☕ Buy Me a Coffee | [buymeacoffee.com/aetherghost.os](https://buymeacoffee.com/aetherghost.os) |
-
-### 🪙 Crypto
-| Token | Network | Address |
-|---|---|---|
-| USDT | TRX — Tron (TRC20) | `TKPkbkZLFyeeUD9QEbmc7FiVfSY9FieaQU` |
-| USDC | SOL — Solana | `9pU3D88DVXzebd8kR5rzGeqjxKHbxBcBKNFwEBRBNzui` |
-| USDT | ETH — Ethereum (ERC20) | `0x09cad574c2c39a88ce931307361682680b795490` |
-| BNB | BSC — BNB Smart Chain (BEP20) | `0x09cad574c2c39a88ce931307361682680b795490` |
-| BNB | ETH — Ethereum (ERC20) | `0x09cad574c2c39a88ce931307361682680b795490` |
-| Bitcoin | BTC — Bitcoin | `15dzX3kqeUD29fbYqoMX4AW9aBDR6ahJ5k` |
-| Bitcoin | BSC — BNB Smart Chain (BEP20) | `0x09cad574c2c39a88ce931307361682680b795490` |
-| Bitcoin | ETH — Ethereum (ERC20) | `0x09cad574c2c39a88ce931307361682680b795490` |
-| Bitcoin | SEGWIT — BTC (SegWit) | `bc1qqmf52ajmvhaxswv97p2q0z82pk4hchv2aqrpmj` |
-
-*Every contribution — no matter how small — keeps Aether Ghost OS active and secure.*
-
----
-
 ## 📄 License
 
 © 2026 Aether Ghost OS — All rights reserved.
